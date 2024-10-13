@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export RPI=3
+export RPI=4
 
 # Build dependencies and MiniJV880
 # ./build.sh

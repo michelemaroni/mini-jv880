@@ -96,6 +96,7 @@ bool CMiniJV880::Initialize(void) {
 
   FIL f;
   unsigned int nBytesRead = 0;
+
   if (f_open(&f, "jv880_rom1.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
     LOGERR("Cannot open jv880_rom1.bin");
     return false;
@@ -103,25 +104,25 @@ bool CMiniJV880::Initialize(void) {
   f_read(&f, rom1, ROM1_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_rom2.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_rom2.bin");
     return false;
   }
   f_read(&f, rom2, ROM2_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_nvram.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_nvram.bin");
     return false;
   }
   f_read(&f, nvram, NVRAM_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_waverom1.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_waverom1.bin");
     return false;
   }
   f_read(&f, pcm1, 0x200000, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_waverom2.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_waverom2.bin");
     return false;
   }
   f_read(&f, pcm2, 0x200000, &nBytesRead);
@@ -170,112 +171,112 @@ void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
     }
   }
 
-  if (m_KompleteKontrol != 0) {
-    m_KompleteKontrol->Update();
+  // if (m_KompleteKontrol != 0) {
+  //   m_KompleteKontrol->Update();
 
-    uint32_t btn = 0;
-    if (m_KompleteKontrol->status.left)
-      btn |= 1 << MCU_BUTTON_CURSOR_L;
-    else
-      btn &= ~(1 << MCU_BUTTON_CURSOR_L);
-    if (m_KompleteKontrol->status.right)
-      btn |= 1 << MCU_BUTTON_CURSOR_R;
-    else
-      btn &= ~(1 << MCU_BUTTON_CURSOR_R);
-    if (m_KompleteKontrol->status.loop)
-      btn |= 1 << MCU_BUTTON_TONE_SELECT;
-    else
-      btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
-    if (m_KompleteKontrol->status.metro)
-      btn |= 1 << MCU_BUTTON_MUTE;
-    else
-      btn &= ~(1 << MCU_BUTTON_MUTE);
-    if (m_KompleteKontrol->status.tempo)
-      btn |= 1 << MCU_BUTTON_DATA;
-    else
-      btn &= ~(1 << MCU_BUTTON_DATA);
-    if (m_KompleteKontrol->status.undo)
-      btn |= 1 << MCU_BUTTON_MONITOR;
-    else
-      btn &= ~(1 << MCU_BUTTON_MONITOR);
-    if (m_KompleteKontrol->status.quantize)
-      btn |= 1 << MCU_BUTTON_COMPARE;
-    else
-      btn &= ~(1 << MCU_BUTTON_COMPARE);
-    if (m_KompleteKontrol->status.jstick_push)
-      btn |= 1 << MCU_BUTTON_ENTER;
-    else
-      btn &= ~(1 << MCU_BUTTON_ENTER);
-    if (m_KompleteKontrol->status.ideas)
-      btn |= 1 << MCU_BUTTON_UTILITY;
-    else
-      btn &= ~(1 << MCU_BUTTON_UTILITY);
-    if (m_KompleteKontrol->status.play)
-      btn |= 1 << MCU_BUTTON_PREVIEW;
-    else
-      btn &= ~(1 << MCU_BUTTON_PREVIEW);
-    if (m_KompleteKontrol->status.quantize)
-      btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
-    else
-      btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
-    if (m_KompleteKontrol->status.shift)
-      btn |= 1 << MCU_BUTTON_EDIT;
-    else
-      btn &= ~(1 << MCU_BUTTON_EDIT);
-    if (m_KompleteKontrol->status.scale)
-      btn |= 1 << MCU_BUTTON_SYSTEM;
-    else
-      btn &= ~(1 << MCU_BUTTON_SYSTEM);
-    if (m_KompleteKontrol->status.arp)
-      btn |= 1 << MCU_BUTTON_RHYTHM;
-    else
-      btn &= ~(1 << MCU_BUTTON_RHYTHM);
-    mcu.mcu_button_pressed = btn;
+  //   uint32_t btn = 0;
+  //   if (m_KompleteKontrol->status.left)
+  //     btn |= 1 << MCU_BUTTON_CURSOR_L;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_CURSOR_L);
+  //   if (m_KompleteKontrol->status.right)
+  //     btn |= 1 << MCU_BUTTON_CURSOR_R;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_CURSOR_R);
+  //   if (m_KompleteKontrol->status.loop)
+  //     btn |= 1 << MCU_BUTTON_TONE_SELECT;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
+  //   if (m_KompleteKontrol->status.metro)
+  //     btn |= 1 << MCU_BUTTON_MUTE;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_MUTE);
+  //   if (m_KompleteKontrol->status.tempo)
+  //     btn |= 1 << MCU_BUTTON_DATA;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_DATA);
+  //   if (m_KompleteKontrol->status.undo)
+  //     btn |= 1 << MCU_BUTTON_MONITOR;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_MONITOR);
+  //   if (m_KompleteKontrol->status.quantize)
+  //     btn |= 1 << MCU_BUTTON_COMPARE;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_COMPARE);
+  //   if (m_KompleteKontrol->status.jstick_push)
+  //     btn |= 1 << MCU_BUTTON_ENTER;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_ENTER);
+  //   if (m_KompleteKontrol->status.ideas)
+  //     btn |= 1 << MCU_BUTTON_UTILITY;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_UTILITY);
+  //   if (m_KompleteKontrol->status.play)
+  //     btn |= 1 << MCU_BUTTON_PREVIEW;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_PREVIEW);
+  //   if (m_KompleteKontrol->status.quantize)
+  //     btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
+  //   if (m_KompleteKontrol->status.shift)
+  //     btn |= 1 << MCU_BUTTON_EDIT;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_EDIT);
+  //   if (m_KompleteKontrol->status.scale)
+  //     btn |= 1 << MCU_BUTTON_SYSTEM;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_SYSTEM);
+  //   if (m_KompleteKontrol->status.arp)
+  //     btn |= 1 << MCU_BUTTON_RHYTHM;
+  //   else
+  //     btn &= ~(1 << MCU_BUTTON_RHYTHM);
+  //   mcu.mcu_button_pressed = btn;
 
-    if (m_KompleteKontrol->status.jstick_val > lastEncoderPos ||
-        (lastEncoderPos == 15 && m_KompleteKontrol->status.jstick_val == 0))
-      mcu.MCU_EncoderTrigger(1);
-    else if (m_KompleteKontrol->status.jstick_val < lastEncoderPos ||
-             (lastEncoderPos == 0 &&
-              m_KompleteKontrol->status.jstick_val == 15))
-      mcu.MCU_EncoderTrigger(0);
-    lastEncoderPos = m_KompleteKontrol->status.jstick_val;
+  //   if (m_KompleteKontrol->status.jstick_val > lastEncoderPos ||
+  //       (lastEncoderPos == 15 && m_KompleteKontrol->status.jstick_val == 0))
+  //     mcu.MCU_EncoderTrigger(1);
+  //   else if (m_KompleteKontrol->status.jstick_val < lastEncoderPos ||
+  //            (lastEncoderPos == 0 &&
+  //             m_KompleteKontrol->status.jstick_val == 15))
+  //     mcu.MCU_EncoderTrigger(0);
+  //   lastEncoderPos = m_KompleteKontrol->status.jstick_val;
 
-    for (size_t y = 0; y < 32; y++) {
-      for (size_t x = 0; x < 128; x++) {
-        int destX = (int)(((float)x / 128) * 820);
-        int destY = (int)(((float)y / 32) * 100);
-        int sum = 0;
-        for (int py = -1; py <= 1; py++) {
-          for (int px = -1; px <= 1; px++) {
-            if ((destY + py) >= 0 && (destX + px) >= 0) {
-              bool pixel =
-                  mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
-              sum += pixel;
-            }
-          }
-        }
+  //   for (size_t y = 0; y < 32; y++) {
+  //     for (size_t x = 0; x < 128; x++) {
+  //       int destX = (int)(((float)x / 128) * 820);
+  //       int destY = (int)(((float)y / 32) * 100);
+  //       int sum = 0;
+  //       for (int py = -1; py <= 1; py++) {
+  //         for (int px = -1; px <= 1; px++) {
+  //           if ((destY + py) >= 0 && (destX + px) >= 0) {
+  //             bool pixel =
+  //                 mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
+  //             sum += pixel;
+  //           }
+  //         }
+  //       }
 
-        bool pixel = sum > 0;
-        // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
-        set_pixel(screen_buffer, x, y, pixel);
+  //       bool pixel = sum > 0;
+  //       // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
+  //       set_pixel(screen_buffer, x, y, pixel);
 
-        // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
-      }
-    }
+  //       // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
+  //     }
+  //   }
 
-    KompleteKontrolScreenCommand tmp;
-    for (size_t row = 0; row < 4; row++) {
-      for (size_t column = 0; column < 4; column++) {
-        tmp.lengthRow = 1;
-        tmp.lengthCol = 32;
-        tmp.offsetRow = row;
-        tmp.offsetCol = column * 32;
-        memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
-        m_KompleteKontrol->SendScreen(&tmp);
-      }
-    }
-  }
+  //   KompleteKontrolScreenCommand tmp;
+  //   for (size_t row = 0; row < 4; row++) {
+  //     for (size_t column = 0; column < 4; column++) {
+  //       tmp.lengthRow = 1;
+  //       tmp.lengthCol = 32;
+  //       tmp.offsetRow = row;
+  //       tmp.offsetCol = column * 32;
+  //       memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
+  //       m_KompleteKontrol->SendScreen(&tmp);
+  //     }
+  //   }
+  // }
 
   if (!bPlugAndPlayUpdated)
     return;
@@ -289,25 +290,25 @@ void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
     }
   }
 
-  if (m_KompleteKontrol == 0) {
-    m_KompleteKontrol =
-        (CUSBKompleteKontrolDevice *)CDeviceNameService::Get()->GetDevice(
-            "kompletekontrol1", FALSE);
-    if (m_KompleteKontrol != 0) {
-      // m_KompleteKontrol->RegisterPacketHandler(s_pMIDIPacketHandler[m_nInstance]);
-      m_KompleteKontrol->RegisterRemovedHandler(DeviceRemovedHandler, this);
+//   if (m_KompleteKontrol == 0) {
+//     m_KompleteKontrol =
+//         (CUSBKompleteKontrolDevice *)CDeviceNameService::Get()->GetDevice(
+//             "kompletekontrol1", FALSE);
+//     if (m_KompleteKontrol != 0) {
+//       // m_KompleteKontrol->RegisterPacketHandler(s_pMIDIPacketHandler[m_nInstance]);
+//       m_KompleteKontrol->RegisterRemovedHandler(DeviceRemovedHandler, this);
 
-      m_KompleteKontrol->DisableLocalControls();
-      // m_KompleteKontrol->SendLEDs();
+//       m_KompleteKontrol->DisableLocalControls();
+//       // m_KompleteKontrol->SendLEDs();
 
-      // u8 content[256] = {0};
-      // for (size_t i = 0; i < 256; i++) {
-      //   content[i] = 0xff;
-      // }
-      // m_KompleteKontrol->SendScreenUpper(content);
-      // m_KompleteKontrol->SendScreenLower(content);
-    }
-  }
+//       // u8 content[256] = {0};
+//       // for (size_t i = 0; i < 256; i++) {
+//       //   content[i] = 0xff;
+//       // }
+//       // m_KompleteKontrol->SendScreenUpper(content);
+//       // m_KompleteKontrol->SendScreenLower(content);
+//     }
+//   }
 }
 
 void CMiniJV880::USBMIDIMessageHandler(unsigned nCable, u8 *pPacket,
@@ -325,8 +326,8 @@ void CMiniJV880::DeviceRemovedHandler(CDevice *pDevice, void *pContext) {
 
   if (pDevice == pThis->m_pMIDIDevice)
     pThis->m_pMIDIDevice = 0;
-  if (pDevice == pThis->m_KompleteKontrol)
-    pThis->m_KompleteKontrol = 0;
+  // if (pDevice == pThis->m_KompleteKontrol)
+  //   pThis->m_KompleteKontrol = 0;
 }
 
 // double avg = 0;

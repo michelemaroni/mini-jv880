@@ -33,7 +33,7 @@
 #include <circle/spimaster.h>
 #include <circle/spinlock.h>
 #include <circle/types.h>
-#include <circle/usb/usbkompletekontrol.h>
+// #include <circle/usb/usbkompletekontrol.h>
 #include <circle/usb/usbmidi.h>
 #include <fatfs/ff.h>
 #include <stdint.h>
@@ -60,7 +60,7 @@ private:
   FATFS *m_pFileSystem;
 
   CUSBMIDIDevice *volatile m_pMIDIDevice = 0;
-  CUSBKompleteKontrolDevice *volatile m_KompleteKontrol = 0;
+  // CUSBKompleteKontrolDevice *volatile m_KompleteKontrol = 0;
   int lastEncoderPos = 0;
 
   CSoundBaseDevice *m_pSoundDevice;
