@@ -163,6 +163,8 @@ bool CMiniJV880::Initialize(void) {
 }
 
 void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
+
+  m_UI.Process ();
   uint32_t *lcd_buffer = mcu.lcd.LCD_Update();
 
   for (size_t y = 0; y < lcd_height; y++) {

@@ -92,6 +92,7 @@ void CConfig::Load (void)
 	m_nButtonPinRight = m_Properties.GetNumber ("ButtonPinRight", 0);
 	m_nButtonPinData = m_Properties.GetNumber ("ButtonPinData", 0);
 	m_nButtonPinToneSelect = m_Properties.GetNumber ("ButtonPinToneSelect", 0);
+	m_nButtonPinPatchPerform = m_Properties.GetNumber ("ButtonPinPatchPerform", 0);
 	m_nButtonPinEdit = m_Properties.GetNumber ("ButtonPinEdit", 0);
 	m_nButtonPinSystem = m_Properties.GetNumber ("ButtonPinSystem", 0);
 	m_nButtonPinRhythm = m_Properties.GetNumber ("ButtonPinRhythm", 0);
@@ -106,6 +107,7 @@ void CConfig::Load (void)
 	m_ButtonActionRight = m_Properties.GetString ("ButtonActionRight", "");
 	m_ButtonActionData = m_Properties.GetString ("ButtonActionData", "");
 	m_ButtonActionToneSelect = m_Properties.GetString ("ButtonActionToneSelect", "");
+	m_ButtonActionPatchPerform = m_Properties.GetString ("ButtonActionPatchPerform", "");
 	m_ButtonActionEdit = m_Properties.GetString ("ButtonActionEdit", "");
 	m_ButtonActionSystem = m_Properties.GetString ("ButtonActionSystem", "");
 	m_ButtonActionRhythm = m_Properties.GetString ("ButtonActionRhythm", "");

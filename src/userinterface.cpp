@@ -19,6 +19,7 @@
 //
 #include "userinterface.h"
 #include "minijv880.h"
+#include "mcu.h"
 #include <circle/logger.h>
 #include <circle/string.h>
 #include <circle/startup.h>
@@ -155,7 +156,7 @@ bool CUserInterface::Initialize (void)
 		assert (m_pLCDBuffered);
 
 		LCDWrite ("\x1B[?25l\x1B""d+");		// cursor off, autopage mode
-		LCDWrite ("MiniDexed\nLoading...");
+		LCDWrite ("MiniJV880\nLoading...");
 		m_pLCDBuffered->Update ();
 
 		LOGDBG ("LCD initialized");
@@ -233,6 +234,7 @@ void CUserInterface::LCDWrite (const char *pString)
 
 void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 {
+	uint32_t btn = 0;
 	switch (Event)
 	{
 	case CKY040::EventSwitchDown:
@@ -249,7 +251,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 			// triggered after the encoder is rotated
 			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
-            // TODO: map MCU encoder
+            m_pMiniJV880->mcu.MCU_EncoderTrigger(1);
         }
 		break;
 
@@ -257,7 +259,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 		if (m_bSwitchPressed) {
 			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
-            // TODO: map MCU encoder
+            m_pMiniJV880->mcu.MCU_EncoderTrigger(0);
         }
 		break;
 
@@ -285,53 +287,58 @@ void CUserInterface::EncoderEventStub (CKY040::TEvent Event, void *pParam)
 
 void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 {
-	switch (Event)
-	{
-	case CUIButton::BtnEventPreview:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventLeft:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventRight:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventData:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventToneSelect:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventPatchPerform:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventEdit:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventSystem:
-		// TODO: map MCU keys
-		break;
-
-	case CUIButton::BtnEventRhythm:
-		// TODO: map MCU keys
-		break;
-
-    case CUIButton::BtnEventUtility:
-        break;
-
-	case CUIButton::BtnEventEnter:
-		break;
-
-	default:
-		break;
+	uint32_t btn = 0;
+	if (Event == CUIButton::BtnEventPreview) {
+		btn |= 1 << MCU_BUTTON_PREVIEW;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_PREVIEW);
 	}
+	if (Event == CUIButton::BtnEventLeft) {
+		btn |= 1 << MCU_BUTTON_CURSOR_L;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_CURSOR_L);
+	}
+	if (Event == CUIButton::BtnEventRight) {
+		btn |= 1 << MCU_BUTTON_CURSOR_R;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_CURSOR_R);
+	}
+	if (Event == CUIButton::BtnEventData) {
+		btn |= 1 << MCU_BUTTON_DATA;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_DATA);
+	}
+	if (Event == CUIButton::BtnEventToneSelect) {
+		btn |= 1 << MCU_BUTTON_TONE_SELECT;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
+	}
+	if (Event == CUIButton::BtnEventPatchPerform) {
+		btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
+	}
+	if (Event == CUIButton::BtnEventEdit) {
+		// TODO: map MCU keys
+	}
+	if (Event == CUIButton::BtnEventSystem) {
+		// TODO: map MCU keys
+	}
+	if (Event == CUIButton::BtnEventRhythm) {
+		// TODO: map MCU keys
+	}
+	if (Event == CUIButton::BtnEventUtility) {
+		btn |= 1 << MCU_BUTTON_UTILITY;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_UTILITY);
+	}
+	if (Event == CUIButton::BtnEventEnter) {
+		btn |= 1 << MCU_BUTTON_ENTER;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_ENTER);
+	}
+
+	m_pMiniJV880->mcu.mcu_button_pressed = btn;
 }
 
 void CUserInterface::UIButtonsEventStub (CUIButton::BtnEvent Event, void *pParam)
