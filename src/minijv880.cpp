@@ -47,7 +47,7 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
     : CMultiCoreSupport(CMemorySystem::Get()), m_pConfig(pConfig),
       m_pFileSystem(pFileSystem), m_pSoundDevice(0),
       m_bChannelsSwapped(pConfig->GetChannelsSwapped()),
-      m_ScreenUnbuffered(mScreenUnbuffered),
+      screenUnbuffered(mScreenUnbuffered),
       m_UI(this, pGPIOManager, pI2CMaster, pSPIMaster, pConfig){
   assert(m_pConfig);
 
@@ -80,13 +80,17 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
     m_pSoundDevice =
         new CPWMSoundBaseDevice(pInterrupt, 32000, pConfig->GetChunkSize());
   }
-
-  screen_buffer = (u8 *)malloc(512);
 };
 
 bool CMiniJV880::Initialize(void) {
   assert(m_pConfig);
   assert(m_pSoundDevice);
+
+  if (!m_UI.Initialize ())
+	{
+    LOGERR("Failed to initialize UI");
+		return false;
+	}
 
   LOGNOTE("Loading emu files");
   uint8_t *rom1 = (uint8_t *)malloc(ROM1_SIZE);
@@ -165,108 +169,6 @@ bool CMiniJV880::Initialize(void) {
 void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
 
   m_UI.Process ();
-  uint32_t *lcd_buffer = mcu.lcd.LCD_Update();
-
-  for (size_t y = 0; y < lcd_height; y++) {
-    for (size_t x = 0; x < lcd_width; x++) {
-      m_ScreenUnbuffered->SetPixel(x + 800, y + 100,
-                                   lcd_buffer[y * lcd_width + x]);
-    }
-  }
-
-  // if (m_KompleteKontrol != 0) {
-  //   m_KompleteKontrol->Update();
-
-  //   uint32_t btn = 0;
-  //   if (m_KompleteKontrol->status.left)
-  //     btn |= 1 << MCU_BUTTON_CURSOR_L;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_CURSOR_L);
-  //   if (m_KompleteKontrol->status.right)
-  //     btn |= 1 << MCU_BUTTON_CURSOR_R;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_CURSOR_R);
-  //   if (m_KompleteKontrol->status.loop)
-  //     btn |= 1 << MCU_BUTTON_TONE_SELECT;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
-  //   if (m_KompleteKontrol->status.metro)
-  //     btn |= 1 << MCU_BUTTON_MUTE;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_MUTE);
-  //   if (m_KompleteKontrol->status.tempo)
-  //     btn |= 1 << MCU_BUTTON_DATA;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_DATA);
-  //   if (m_KompleteKontrol->status.undo)
-  //     btn |= 1 << MCU_BUTTON_MONITOR;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_MONITOR);
-  //   if (m_KompleteKontrol->status.quantize)
-  //     btn |= 1 << MCU_BUTTON_COMPARE;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_COMPARE);
-  //   if (m_KompleteKontrol->status.jstick_push)
-  //     btn |= 1 << MCU_BUTTON_ENTER;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_ENTER);
-  //   if (m_KompleteKontrol->status.ideas)
-  //     btn |= 1 << MCU_BUTTON_UTILITY;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_UTILITY);
-  //   if (m_KompleteKontrol->status.play)
-  //     btn |= 1 << MCU_BUTTON_PREVIEW;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_PREVIEW);
-  //   if (m_KompleteKontrol->status.quantize)
-  //     btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
-  //   if (m_KompleteKontrol->status.shift)
-  //     btn |= 1 << MCU_BUTTON_EDIT;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_EDIT);
-  //   if (m_KompleteKontrol->status.scale)
-  //     btn |= 1 << MCU_BUTTON_SYSTEM;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_SYSTEM);
-  //   if (m_KompleteKontrol->status.arp)
-  //     btn |= 1 << MCU_BUTTON_RHYTHM;
-  //   else
-  //     btn &= ~(1 << MCU_BUTTON_RHYTHM);
-  //   mcu.mcu_button_pressed = btn;
-
-  //   if (m_KompleteKontrol->status.jstick_val > lastEncoderPos ||
-  //       (lastEncoderPos == 15 && m_KompleteKontrol->status.jstick_val == 0))
-  //     mcu.MCU_EncoderTrigger(1);
-  //   else if (m_KompleteKontrol->status.jstick_val < lastEncoderPos ||
-  //            (lastEncoderPos == 0 &&
-  //             m_KompleteKontrol->status.jstick_val == 15))
-  //     mcu.MCU_EncoderTrigger(0);
-  //   lastEncoderPos = m_KompleteKontrol->status.jstick_val;
-
-  //   for (size_t y = 0; y < 32; y++) {
-  //     for (size_t x = 0; x < 128; x++) {
-  //       int destX = (int)(((float)x / 128) * 820);
-  //       int destY = (int)(((float)y / 32) * 100);
-  //       int sum = 0;
-  //       for (int py = -1; py <= 1; py++) {
-  //         for (int px = -1; px <= 1; px++) {
-  //           if ((destY + py) >= 0 && (destX + px) >= 0) {
-  //             bool pixel =
-  //                 mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
-  //             sum += pixel;
-  //           }
-  //         }
-  //       }
-
-  //       bool pixel = sum > 0;
-  //       // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
-  //       set_pixel(screen_buffer, x, y, pixel);
-
-  //       // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
-  //     }
-  //   }
 
   //   KompleteKontrolScreenCommand tmp;
   //   for (size_t row = 0; row < 4; row++) {

@@ -70,6 +70,8 @@ private:
 
 	CKY040 *m_pRotaryEncoder;
 	bool m_bSwitchPressed;
+
+	u8 *screen_buffer;
 };
 
 #endif

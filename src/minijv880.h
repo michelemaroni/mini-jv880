@@ -56,6 +56,8 @@ public:
 
   MCU mcu;
 
+  CScreenDevice *screenUnbuffered;
+
 private:
   CConfig *m_pConfig;
   FATFS *m_pFileSystem;
@@ -68,13 +70,9 @@ private:
   bool m_bChannelsSwapped;
   unsigned m_nQueueSizeFrames;
 
-  CScreenDevice *m_ScreenUnbuffered;
-
   CUserInterface m_UI;
 
   static CMiniJV880 *s_pThis;
-
-  u8 *screen_buffer;
 };
 
 #endif

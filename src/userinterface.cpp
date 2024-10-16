@@ -28,6 +28,13 @@
 
 LOGMODULE ("ui");
 
+void set_pixel(unsigned char *screen, int x, int y, bool value) {
+  if (!value)
+    screen[(y / 8) * 128 + x] |= 1 << (y % 8);
+  else
+    screen[(y / 8) * 128 + x] &= ~(1 << (y % 8));
+}
+
 CUserInterface::CUserInterface (CMiniJV880 *pMiniJV880, CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster, CSPIMaster *pSPIMaster, CConfig *pConfig)
 :	m_pMiniJV880 (pMiniJV880),
 	m_pGPIOManager (pGPIOManager),
@@ -40,6 +47,7 @@ CUserInterface::CUserInterface (CMiniJV880 *pMiniJV880, CGPIOManager *pGPIOManag
 	m_pRotaryEncoder (0),
 	m_bSwitchPressed (false)
 {
+	screen_buffer = (u8 *)malloc(512);
 }
 
 CUserInterface::~CUserInterface (void)
@@ -214,6 +222,13 @@ bool CUserInterface::Initialize (void)
 
 void CUserInterface::Process (void)
 {
+	uint32_t *lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
+
+	for (size_t y = 0; y < lcd_height; y++) {
+		for (size_t x = 0; x < lcd_width; x++) {
+			m_pMiniJV880->screenUnbuffered->SetPixel(x + 800, y + 100, lcd_buffer[y * lcd_width + x]);
+		}
+	}
 	if (m_pLCDBuffered)
 	{
 		m_pLCDBuffered->Update ();
@@ -222,6 +237,27 @@ void CUserInterface::Process (void)
 	{
 		m_pUIButtons->Update();
 	}
+	for (size_t y = 0; y < 32; y++) {
+      for (size_t x = 0; x < 128; x++) {
+        int destX = (int)(((float)x / 128) * 820);
+        int destY = (int)(((float)y / 32) * 100);
+        int sum = 0;
+        for (int py = -1; py <= 1; py++) {
+          for (int px = -1; px <= 1; px++) {
+            if ((destY + py) >= 0 && (destX + px) >= 0) {
+              bool pixel = m_pMiniJV880->mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
+              sum += pixel;
+            }
+          }
+        }
+
+        bool pixel = sum > 0;
+        // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
+        set_pixel(screen_buffer, x, y, pixel);
+
+        // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
+      }
+    }
 }
 
 void CUserInterface::LCDWrite (const char *pString)
