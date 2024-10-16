@@ -240,6 +240,7 @@ CUIButtons::CUIButtons (
             unsigned mutePin, const char *muteAction,
             unsigned monitorPin, const char *monitorAction,
             unsigned comparePin, const char *compareAction,
+			unsigned enterPin, const char *enterAction,
 			unsigned doubleClickTimeout, unsigned longPressTimeout
 )
 :	m_doubleClickTimeout(doubleClickTimeout),
@@ -270,6 +271,8 @@ CUIButtons::CUIButtons (
     m_monitorAction(CUIButton::triggerTypeFromString(monitorAction)),
     m_comparePin(comparePin),
     m_compareAction(CUIButton::triggerTypeFromString(compareAction)),
+	m_enterPin(enterPin),
+	m_enterAction(CUIButton::triggerTypeFromString(enterAction)),
 	m_eventHandler (0),
 	m_lastTick (0)
 {

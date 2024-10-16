@@ -1,5 +1,7 @@
 #
 # Makefile
+# export PATH=$(readlink -f ./gcc-*aarch64-none*/bin/):$PATH
+# RPI=4 bash -ex build.sh
 #
 
 CIRCLE_STDLIB_DIR = ../circle-stdlib

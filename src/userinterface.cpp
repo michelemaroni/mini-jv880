@@ -175,6 +175,7 @@ bool CUserInterface::Initialize (void)
                                     m_pConfig->GetButtonPinMute (), m_pConfig->GetButtonActionMute (),
                                     m_pConfig->GetButtonPinMonitor (), m_pConfig->GetButtonActionMonitor (),
                                     m_pConfig->GetButtonPinCompare (), m_pConfig->GetButtonActionCompare (),
+									m_pConfig->GetButtonPinEnter (), m_pConfig->GetButtonActionEnter (),
 									m_pConfig->GetDoubleClickTimeout (), m_pConfig->GetLongPressTimeout ()
 								  );
 	assert (m_pUIButtons);
@@ -246,7 +247,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 		if (m_bSwitchPressed) {
 			// We must reset the encoder switch button to prevent events from being
 			// triggered after the encoder is rotated
-			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinPatchPerform());
+			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
             // TODO: map MCU encoder
         }
@@ -254,7 +255,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 
 	case CKY040::EventCounterclockwise:
 		if (m_bSwitchPressed) {
-			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinPatchPerform());
+			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
             // TODO: map MCU encoder
         }
@@ -324,6 +325,9 @@ void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 
     case CUIButton::BtnEventUtility:
         break;
+
+	case CUIButton::BtnEventEnter:
+		break;
 
 	default:
 		break;

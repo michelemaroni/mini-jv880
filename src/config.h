@@ -116,6 +116,7 @@ public:
 	unsigned GetButtonPinMute (void) const;
 	unsigned GetButtonPinMonitor (void) const;
 	unsigned GetButtonPinCompare (void) const;
+	unsigned GetButtonPinEnter (void) const;
 
 	// Action type for buttons: "click", "doubleclick", "longpress", ""
 	const char *GetButtonActionPreview (void) const;
@@ -131,6 +132,7 @@ public:
 	const char *GetButtonActionMute (void) const;
 	const char *GetButtonActionMonitor (void) const;
 	const char *GetButtonActionCompare (void) const;
+	const char *GetButtonActionEnter (void) const;
 	
 	// Timeouts for button events in milliseconds
 	unsigned GetDoubleClickTimeout (void) const;
@@ -202,6 +204,7 @@ private:
 	unsigned m_nButtonPinMute;
 	unsigned m_nButtonPinMonitor;
 	unsigned m_nButtonPinCompare;
+	unsigned m_nButtonPinEnter;
 
 	std::string m_ButtonActionPreview;
 	std::string m_ButtonActionLeft;
@@ -216,6 +219,7 @@ private:
 	std::string m_ButtonActionMute;
 	std::string m_ButtonActionMonitor;
 	std::string m_ButtonActionCompare;
+	std::string m_ButtonActionEnter;
 	
 	unsigned m_nDoubleClickTimeout;
 	unsigned m_nLongPressTimeout;	

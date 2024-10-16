@@ -58,7 +58,8 @@ public:
         BtnEventMute = 11,
         BtnEventMonitor = 12,
         BtnEventCompare = 13,
-		BtnEventUnknown = 14
+		BtnEventEnter = 14,
+		BtnEventUnknown = 15
 	};
 	
 	CUIButton (void);
@@ -124,6 +125,7 @@ public:
             unsigned mutePin, const char *muteAction,
             unsigned monitorPin, const char *monitorAction,
             unsigned comparePin, const char *compareAction,
+			unsigned enterPin, const char *enterAction,
 			unsigned doubleClickTimeout, unsigned longPressTimeout
 	);
 	~CUIButtons (void);
@@ -172,6 +174,8 @@ private:
     CUIButton::BtnTrigger m_monitorAction;
     unsigned m_comparePin;
     CUIButton::BtnTrigger m_compareAction;
+	unsigned m_enterPin;
+	CUIButton::BtnTrigger m_enterAction;
 
 	BtnEventHandler *m_eventHandler;
 	void *m_eventParam;

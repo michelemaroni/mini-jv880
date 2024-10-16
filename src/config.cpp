@@ -99,6 +99,7 @@ void CConfig::Load (void)
 	m_nButtonPinMute = m_Properties.GetNumber ("ButtonPinMute", 0);
 	m_nButtonPinMonitor = m_Properties.GetNumber ("ButtonPinMonitor", 0);
 	m_nButtonPinCompare = m_Properties.GetNumber ("ButtonPinCompare", 0);
+	m_nButtonPinEnter = m_Properties.GetNumber ("ButtonPinEnter", 11);
 
 	m_ButtonActionPreview = m_Properties.GetString ("ButtonActionPreview", "");
 	m_ButtonActionLeft = m_Properties.GetString ("ButtonActionLeft", "");
@@ -112,6 +113,7 @@ void CConfig::Load (void)
 	m_ButtonActionMute = m_Properties.GetString ("ButtonActionMute", "");
 	m_ButtonActionMonitor = m_Properties.GetString ("ButtonActionMonitor", "");
 	m_ButtonActionCompare = m_Properties.GetString ("ButtonActionCompare", "");
+	m_ButtonActionEnter = m_Properties.GetString("ButtonActionEnter", "click");
 
 	m_nDoubleClickTimeout = m_Properties.GetNumber ("DoubleClickTimeout", 400);
 	m_nLongPressTimeout = m_Properties.GetNumber ("LongPressTimeout", 600);
@@ -349,6 +351,11 @@ unsigned CConfig::GetButtonPinCompare (void) const
 	return m_nButtonPinCompare;
 }
 
+unsigned CConfig::GetButtonPinEnter (void) const
+{
+	return m_nButtonPinEnter;
+}
+
 const char *CConfig::GetButtonActionPreview (void) const
 {
 	return m_ButtonActionPreview.c_str();
@@ -412,6 +419,11 @@ const char *CConfig::GetButtonActionMonitor (void) const
 const char *CConfig::GetButtonActionCompare (void) const
 {
 	return m_ButtonActionCompare.c_str();
+}
+
+const char *CConfig::GetButtonActionEnter (void) const
+{
+	return m_ButtonActionEnter.c_str();
 }
 
 bool CConfig::GetEncoderEnabled (void) const
