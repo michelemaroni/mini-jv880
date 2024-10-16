@@ -23,6 +23,7 @@
 #define ARM_ALLOW_MULTI_CORE
 
 #include "config.h"
+#include "userinterface.h"
 #include "emulator/mcu.h"
 #include <circle/gpiomanager.h>
 #include <circle/i2cmaster.h>
@@ -41,7 +42,7 @@
 class CMiniJV880 : public CMultiCoreSupport {
 public:
   CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
-             CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster,
+             CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster, CSPIMaster *pSPIMaster,
              FATFS *pFileSystem, CScreenDevice *mScreenUnbuffered);
 
   bool Initialize(void);
@@ -68,6 +69,8 @@ private:
   unsigned m_nQueueSizeFrames;
 
   CScreenDevice *m_ScreenUnbuffered;
+
+  CUserInterface m_UI;
 
   static CMiniJV880 *s_pThis;
 

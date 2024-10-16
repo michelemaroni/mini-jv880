@@ -307,10 +307,8 @@ boolean CUIButtons::Initialize (void)
 	CUIButton::BtnTrigger triggers[MAX_BUTTONS] = {
 		// Normal buttons
 		m_previewAction, m_leftAction, m_rightAction, m_dataAction, m_toneSelectAction,
-		m_patchPerformAction, m_editAction, m_systemAction, m_rhythmAction, 
-		// MIDI Buttons only support a single click (at present)
-		CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick,
-		CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick, CUIButton::BtnTriggerClick
+		m_patchPerformAction, m_editAction, m_systemAction, m_rhythmAction, m_utilityAction,
+		m_muteAction, m_monitorAction, m_compareAction
 	};
 	CUIButton::BtnEvent events[MAX_BUTTONS] = {
 		// Normal buttons

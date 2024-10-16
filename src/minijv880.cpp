@@ -42,12 +42,13 @@ CMiniJV880 *CMiniJV880::s_pThis = 0;
 LOGMODULE("minijv880");
 
 CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
-                       CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster,
+                       CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster, CSPIMaster *pSPIMaster,
                        FATFS *pFileSystem, CScreenDevice *mScreenUnbuffered)
     : CMultiCoreSupport(CMemorySystem::Get()), m_pConfig(pConfig),
       m_pFileSystem(pFileSystem), m_pSoundDevice(0),
       m_bChannelsSwapped(pConfig->GetChannelsSwapped()),
-      m_ScreenUnbuffered(mScreenUnbuffered) {
+      m_ScreenUnbuffered(mScreenUnbuffered),
+      m_UI(this, pGPIOManager, pI2CMaster, pSPIMaster, pConfig){
   assert(m_pConfig);
 
   s_pThis = this;

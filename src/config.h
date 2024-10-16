@@ -28,6 +28,10 @@
 #include <circle/sysconfig.h>
 #include <string>
 
+#define SPI_INACTIVE	255
+#define SPI_DEF_CLOCK	15000	// kHz
+#define SPI_DEF_MODE	0		// Default mode (0,1,2,3)
+
 class CConfig		// Configuration for MiniJV880
 {
 public:
@@ -39,6 +43,10 @@ public:
 #else
 	static const unsigned MaxUSBMIDIDevices = 4;
 #endif
+
+// TODO - Leave this for uimenu.cpp for now, but it will need to be dynamic at some point...
+	static const unsigned LCDColumns = 16;		// HD44780 LCD
+	static const unsigned LCDRows = 2;
 
 public:
 	CConfig (FATFS *pFileSystem);
@@ -55,6 +63,85 @@ public:
 	// MIDI
 	unsigned GetMIDIBaudRate (void) const;
 
+	// HD44780 LCD
+	// GPIO pin numbers are chip numbers, not header positions
+	bool GetLCDEnabled (void) const;
+	unsigned GetLCDPinEnable (void) const;
+	unsigned GetLCDPinRegisterSelect (void) const;
+	unsigned GetLCDPinReadWrite (void) const;	// set to 0 if not connected
+	unsigned GetLCDPinData4 (void) const;
+	unsigned GetLCDPinData5 (void) const;
+	unsigned GetLCDPinData6 (void) const;
+	unsigned GetLCDPinData7 (void) const;
+	unsigned GetLCDI2CAddress (void) const;
+	
+	// SSD1306 LCD
+	unsigned GetSSD1306LCDI2CAddress (void) const;
+	unsigned GetSSD1306LCDWidth (void) const;
+	unsigned GetSSD1306LCDHeight (void) const;
+	bool     GetSSD1306LCDRotate (void) const;
+	bool     GetSSD1306LCDMirror (void) const;
+
+	// SPI support
+	unsigned GetSPIBus (void) const;
+	unsigned GetSPIMode (void) const;
+	unsigned GetSPIClockKHz (void) const;
+
+	// ST7789 LCD
+	bool     GetST7789Enabled (void) const;
+	unsigned GetST7789Data (void) const;
+	unsigned GetST7789Select (void) const;
+	unsigned GetST7789Reset (void) const;
+	unsigned GetST7789Backlight (void) const;
+	unsigned GetST7789Width (void) const;
+	unsigned GetST7789Height (void) const;
+	unsigned GetST7789Rotation (void) const;
+	bool     GetST7789SmallFont (void) const;
+
+	unsigned GetLCDColumns (void) const;
+	unsigned GetLCDRows (void) const;
+
+	// GPIO Button Navigation
+	// GPIO pin numbers are chip numbers, not header positions
+	unsigned GetButtonPinPreview (void) const;
+	unsigned GetButtonPinLeft (void) const;
+	unsigned GetButtonPinRight (void) const;
+	unsigned GetButtonPinData (void) const;
+	unsigned GetButtonPinToneSelect (void) const;
+	unsigned GetButtonPinPatchPerform (void) const;
+	unsigned GetButtonPinEdit (void) const;
+	unsigned GetButtonPinSystem (void) const;
+	unsigned GetButtonPinRhythm (void) const;
+	unsigned GetButtonPinUtility (void) const;
+	unsigned GetButtonPinMute (void) const;
+	unsigned GetButtonPinMonitor (void) const;
+	unsigned GetButtonPinCompare (void) const;
+
+	// Action type for buttons: "click", "doubleclick", "longpress", ""
+	const char *GetButtonActionPreview (void) const;
+	const char *GetButtonActionLeft (void) const;
+	const char *GetButtonActionRight (void) const;
+	const char *GetButtonActionData (void) const;
+	const char *GetButtonActionToneSelect (void) const;
+	const char *GetButtonActionPatchPerform (void) const;
+	const char *GetButtonActionEdit (void) const;
+	const char *GetButtonActionSystem (void) const;
+	const char *GetButtonActionRhythm (void) const;
+	const char *GetButtonActionUtility (void) const;
+	const char *GetButtonActionMute (void) const;
+	const char *GetButtonActionMonitor (void) const;
+	const char *GetButtonActionCompare (void) const;
+	
+	// Timeouts for button events in milliseconds
+	unsigned GetDoubleClickTimeout (void) const;
+	unsigned GetLongPressTimeout (void) const;
+
+	// KY-040 Rotary Encoder
+	// GPIO pin numbers are chip numbers, not header positions
+	bool GetEncoderEnabled (void) const;
+	unsigned GetEncoderPinClock (void) const;
+	unsigned GetEncoderPinData (void) const;
+
 	bool GetProfileEnabled (void) const;
 
 private:
@@ -67,7 +154,76 @@ private:
 	unsigned m_EngineType;
 
 	unsigned m_nMIDIBaudRate;
+
+
+	bool m_bLCDEnabled;
+	unsigned m_nLCDPinEnable;
+	unsigned m_nLCDPinRegisterSelect;
+	unsigned m_nLCDPinReadWrite;
+	unsigned m_nLCDPinData4;
+	unsigned m_nLCDPinData5;
+	unsigned m_nLCDPinData6;
+	unsigned m_nLCDPinData7;
+	unsigned m_nLCDI2CAddress;
 	
+	unsigned m_nSSD1306LCDI2CAddress;
+	unsigned m_nSSD1306LCDWidth;
+	unsigned m_nSSD1306LCDHeight;
+	bool     m_bSSD1306LCDRotate;
+	bool     m_bSSD1306LCDMirror;
+
+	unsigned m_nSPIBus;
+	unsigned m_nSPIMode;
+	unsigned m_nSPIClockKHz;
+
+	bool     m_bST7789Enabled;
+	unsigned m_nST7789Data;
+	unsigned m_nST7789Select;
+	unsigned m_nST7789Reset;
+	unsigned m_nST7789Backlight;
+	unsigned m_nST7789Width;
+	unsigned m_nST7789Height;
+	unsigned m_nST7789Rotation;
+	unsigned m_bST7789SmallFont;
+
+	unsigned m_nLCDColumns;
+	unsigned m_nLCDRows;
+
+	unsigned m_nButtonPinPreview;
+	unsigned m_nButtonPinLeft;
+	unsigned m_nButtonPinRight;
+	unsigned m_nButtonPinData;
+	unsigned m_nButtonPinToneSelect;
+	unsigned m_nButtonPinPatchPerform;
+	unsigned m_nButtonPinEdit;
+	unsigned m_nButtonPinSystem;
+	unsigned m_nButtonPinRhythm;
+	unsigned m_nButtonPinUtility;
+	unsigned m_nButtonPinMute;
+	unsigned m_nButtonPinMonitor;
+	unsigned m_nButtonPinCompare;
+
+	std::string m_ButtonActionPreview;
+	std::string m_ButtonActionLeft;
+	std::string m_ButtonActionRight;
+	std::string m_ButtonActionData;
+	std::string m_ButtonActionToneSelect;
+	std::string m_ButtonActionPatchPerform;
+	std::string m_ButtonActionEdit;
+	std::string m_ButtonActionSystem;
+	std::string m_ButtonActionRhythm;
+	std::string m_ButtonActionUtility;
+	std::string m_ButtonActionMute;
+	std::string m_ButtonActionMonitor;
+	std::string m_ButtonActionCompare;
+	
+	unsigned m_nDoubleClickTimeout;
+	unsigned m_nLongPressTimeout;	
+
+	bool m_bEncoderEnabled;
+	unsigned m_nEncoderPinClock;
+	unsigned m_nEncoderPinData;
+
 	bool m_bProfileEnabled;
 };
 
