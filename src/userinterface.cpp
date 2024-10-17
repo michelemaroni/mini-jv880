@@ -202,7 +202,7 @@ bool CUserInterface::Initialize (void)
 	{
 		m_pRotaryEncoder = new CKY040 (m_pConfig->GetEncoderPinClock (),
 					       m_pConfig->GetEncoderPinData (),
-					       m_pConfig->GetButtonPinPatchPerform (),
+					       m_pConfig->GetButtonPinEnter (),
 					       m_pGPIOManager);
 		assert (m_pRotaryEncoder);
 
@@ -258,6 +258,19 @@ void CUserInterface::Process (void)
         // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
       }
     }
+
+	//   KompleteKontrolScreenCommand tmp;
+	//   for (size_t row = 0; row < 4; row++) {
+	//     for (size_t column = 0; column < 4; column++) {
+	//       tmp.lengthRow = 1;
+	//       tmp.lengthCol = 32;
+	//       tmp.offsetRow = row;
+	//       tmp.offsetCol = column * 32;
+	//       memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
+	//       m_KompleteKontrol->SendScreen(&tmp);
+	//     }
+	//   }
+	// }
 }
 
 void CUserInterface::LCDWrite (const char *pString)
@@ -381,7 +394,7 @@ void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 	} else {
 		btn &= ~(1 << MCU_BUTTON_ENTER);
 	}
-
+	LOGNOTE("Button: %x", btn);
 	m_pMiniJV880->mcu.mcu_button_pressed = btn;
 }
 

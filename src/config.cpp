@@ -120,6 +120,10 @@ void CConfig::Load (void)
 	m_nDoubleClickTimeout = m_Properties.GetNumber ("DoubleClickTimeout", 400);
 	m_nLongPressTimeout = m_Properties.GetNumber ("LongPressTimeout", 600);
 
+	m_bEncoderEnabled = m_Properties.GetNumber ("EncoderEnabled", 0) != 0;
+	m_nEncoderPinClock = m_Properties.GetNumber ("EncoderPinClock", 10);
+	m_nEncoderPinData = m_Properties.GetNumber ("EncoderPinData", 9);
+
 	m_bProfileEnabled = m_Properties.GetNumber ("ProfileEnabled", 0) != 0;
 }
 

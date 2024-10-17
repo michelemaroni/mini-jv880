@@ -163,19 +163,6 @@ void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
 
   m_UI.Process ();
 
-  //   KompleteKontrolScreenCommand tmp;
-  //   for (size_t row = 0; row < 4; row++) {
-  //     for (size_t column = 0; column < 4; column++) {
-  //       tmp.lengthRow = 1;
-  //       tmp.lengthCol = 32;
-  //       tmp.offsetRow = row;
-  //       tmp.offsetCol = column * 32;
-  //       memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
-  //       m_KompleteKontrol->SendScreen(&tmp);
-  //     }
-  //   }
-  // }
-
   if (!bPlugAndPlayUpdated)
     return;
 
