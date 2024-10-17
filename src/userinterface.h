@@ -45,6 +45,8 @@ public:
 
 	void LCDWrite (const char *pString);		// Print to optional HD44780 display
 
+	void LCDScreenWrite (const void *pBuffer);
+
 private:
 
 	void EncoderEventHandler (CKY040::TEvent Event);

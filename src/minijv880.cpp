@@ -30,13 +30,6 @@
 #include <stdio.h>
 #include <string.h>
 
-void set_pixel(unsigned char *screen, int x, int y, bool value) {
-  if (!value)
-    screen[(y / 8) * 128 + x] |= 1 << (y % 8);
-  else
-    screen[(y / 8) * 128 + x] &= ~(1 << (y % 8));
-}
-
 CMiniJV880 *CMiniJV880::s_pThis = 0;
 
 LOGMODULE("minijv880");
