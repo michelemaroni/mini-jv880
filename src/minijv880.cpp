@@ -41,7 +41,9 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
       m_pFileSystem(pFileSystem), m_pSoundDevice(0),
       m_bChannelsSwapped(pConfig->GetChannelsSwapped()),
       screenUnbuffered(mScreenUnbuffered),
-      m_UI(this, pGPIOManager, pI2CMaster, pSPIMaster, pConfig){
+      m_UI(this, pGPIOManager, pI2CMaster, pSPIMaster, pConfig),
+      m_lastTick(0),
+      m_lastTick1(0) {
   assert(m_pConfig);
 
   s_pThis = this;
@@ -156,6 +158,7 @@ bool CMiniJV880::Initialize(void) {
   m_pSoundDevice->Start();
 
   CMultiCoreSupport::Initialize();
+  LOGNOTE("initialised");
 
   return true;
 }
@@ -214,9 +217,13 @@ void CMiniJV880::Run(unsigned nCore) {
       unsigned nFrames =
           m_nQueueSizeFrames - m_pSoundDevice->GetQueueFramesAvail();
       if (nFrames >= m_nQueueSizeFrames / 2) {
-        // unsigned int startT = CTimer::GetClockTicks();
+        unsigned int startT = CTimer::GetClockTicks();
 
         nSamples = (int)nFrames * 2;
+        if (startT - m_lastTick > 2000000) {
+          m_lastTick = startT;
+          LOGNOTE("has frames to render: %d", nSamples);
+        }
         // mcu.updateSC55(nSamples);
 
         mcu.sample_write_ptr = 0;
@@ -235,7 +242,11 @@ void CMiniJV880::Run(unsigned nCore) {
           mcu.MCU_UpdateUART_RX();
           mcu.MCU_UpdateUART_TX();
           mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
-
+          unsigned int startT1 = CTimer::GetClockTicks();
+          if (startT1 - m_lastTick1 > 2000000) {
+            m_lastTick1 = startT1;
+            LOGNOTE("emu cycle: %d", mcu.mcu.cycles);
+          }
           // mcu.pcm.PCM_Update(mcu.mcu.cycles);
         }
 

@@ -72,6 +72,9 @@ private:
 
   CUserInterface m_UI;
 
+  unsigned m_lastTick;
+  unsigned m_lastTick1;
+
   static CMiniJV880 *s_pThis;
 };
 
