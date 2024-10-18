@@ -174,26 +174,6 @@ void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
       m_pMIDIDevice->RegisterRemovedHandler(DeviceRemovedHandler, this);
     }
   }
-
-//   if (m_KompleteKontrol == 0) {
-//     m_KompleteKontrol =
-//         (CUSBKompleteKontrolDevice *)CDeviceNameService::Get()->GetDevice(
-//             "kompletekontrol1", FALSE);
-//     if (m_KompleteKontrol != 0) {
-//       // m_KompleteKontrol->RegisterPacketHandler(s_pMIDIPacketHandler[m_nInstance]);
-//       m_KompleteKontrol->RegisterRemovedHandler(DeviceRemovedHandler, this);
-
-//       m_KompleteKontrol->DisableLocalControls();
-//       // m_KompleteKontrol->SendLEDs();
-
-//       // u8 content[256] = {0};
-//       // for (size_t i = 0; i < 256; i++) {
-//       //   content[i] = 0xff;
-//       // }
-//       // m_KompleteKontrol->SendScreenUpper(content);
-//       // m_KompleteKontrol->SendScreenLower(content);
-//     }
-//   }
 }
 
 void CMiniJV880::USBMIDIMessageHandler(unsigned nCable, u8 *pPacket,
