@@ -127,7 +127,8 @@ bool CMiniJV880::Initialize(void) {
   f_close(&f);
   LOGNOTE("Emu files loaded");
 
-  mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
+  int ret = mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
+  LOGNOTE("startSC55 returned: %d", ret);
   free(rom1);
   free(rom2);
   free(nvram);
@@ -191,8 +192,6 @@ void CMiniJV880::DeviceRemovedHandler(CDevice *pDevice, void *pContext) {
 
   if (pDevice == pThis->m_pMIDIDevice)
     pThis->m_pMIDIDevice = 0;
-  // if (pDevice == pThis->m_KompleteKontrol)
-  //   pThis->m_KompleteKontrol = 0;
 }
 
 // double avg = 0;

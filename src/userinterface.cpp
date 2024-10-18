@@ -23,8 +23,10 @@
 #include <circle/logger.h>
 #include <circle/string.h>
 #include <circle/startup.h>
+#include <circle/timer.h>
 #include <string.h>
 #include <assert.h>
+#include <chrono>
 
 LOGMODULE ("ui");
 
@@ -45,7 +47,8 @@ CUserInterface::CUserInterface (CMiniJV880 *pMiniJV880, CGPIOManager *pGPIOManag
 	m_pLCDBuffered (0),
 	m_pUIButtons (0),
 	m_pRotaryEncoder (0),
-	m_bSwitchPressed (false)
+	m_bSwitchPressed (false),
+	m_lastTick (0)
 {
 	screen_buffer = (u8 *)malloc(512);
 }
@@ -222,7 +225,25 @@ bool CUserInterface::Initialize (void)
 
 void CUserInterface::Process (void)
 {
-	uint32_t *lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
+	uint32_t* lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
+
+	unsigned currentTick = CTimer::GetClockTicks();
+	if (currentTick - m_lastTick < 2000000) {
+		// Not enough time has passed, just return
+	} else {
+		m_lastTick = currentTick;
+		for (int i = 0; i < 2; i++)
+		{
+			std::string str = "MCU LCD_Data Character row " + std::to_string(i);
+			for (int j = 0; j < 24; j++)
+			{
+				uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
+				str.append(" ");
+				str.append(std::to_string(ch));
+			}
+			LOGNOTE(str.c_str());
+		}
+	}
 
 	for (size_t y = 0; y < lcd_height; y++) {
 		for (size_t x = 0; x < lcd_width; x++) {
