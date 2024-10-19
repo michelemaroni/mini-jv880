@@ -26,7 +26,7 @@
 
 #define BUTTONS_UPDATE_NUM_TICKS 100
 #define DEBOUNCE_TIME 20
-#define MAX_GPIO_BUTTONS 13  // 13 UI buttons
+#define MAX_GPIO_BUTTONS 14  // 14 UI buttons
 #define MAX_BUTTONS (MAX_GPIO_BUTTONS)
 
 class CUIButtons;

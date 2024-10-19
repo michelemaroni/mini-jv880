@@ -227,29 +227,12 @@ void CUserInterface::Process (void)
 {
 	uint32_t* lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
 
-	unsigned currentTick = CTimer::GetClockTicks();
-	if (currentTick - m_lastTick < 2000000) {
-		// Not enough time has passed, just return
-	} else {
-		m_lastTick = currentTick;
-		for (int i = 0; i < 2; i++)
-		{
-			std::string str = "MCU LCD_Data Character row " + std::to_string(i);
-			for (int j = 0; j < 24; j++)
-			{
-				uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
-				str.append(" ");
-				str.append(std::to_string(ch));
-			}
-			LOGNOTE(str.c_str());
-		}
-	}
-
 	for (size_t y = 0; y < lcd_height; y++) {
 		for (size_t x = 0; x < lcd_width; x++) {
 			m_pMiniJV880->screenUnbuffered->SetPixel(x + 800, y + 100, lcd_buffer[y * lcd_width + x]);
 		}
 	}
+
 	if (m_pLCDBuffered)
 	{
 		m_pLCDBuffered->Update ();
@@ -275,10 +258,23 @@ void CUserInterface::Process (void)
         bool pixel = sum > 0;
         // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
         set_pixel(screen_buffer, x, y, pixel);
-		LCDScreenWrite(screen_buffer);
+		// LCDScreenWrite(screen_buffer);
         // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
       }
     }
+
+	CString Msg ("\x1B[H\E[?25l");
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 24; j++)
+		{
+			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
+			std::string str(1, ch);
+			const char *pString = str.c_str();
+			Msg.Append(pString);
+		}
+	}
+	LCDWrite(Msg);
 
 	//   KompleteKontrolScreenCommand tmp;
 	//   for (size_t row = 0; row < 4; row++) {

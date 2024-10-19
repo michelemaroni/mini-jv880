@@ -327,7 +327,8 @@ boolean CUIButtons::Initialize (void)
 		CUIButton::BtnEventUtility,
         CUIButton::BtnEventMute,
         CUIButton::BtnEventMonitor,
-        CUIButton::BtnEventCompare
+        CUIButton::BtnEventCompare,
+		CUIButton::BtnEventEnter,
 	};
 
 	// Setup normal GPIO buttons first
