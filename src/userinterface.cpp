@@ -271,23 +271,16 @@ void CUserInterface::Process (void)
 			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
 			std::string str(1, ch);
 			const char *pString = str.c_str();
+			if (i == 0 && (j == 1 || j == 4 || j == 22 || j == 23)) {
+				continue;
+			}
+			if (i == 1 && (j == 10 || j == 12 || j == 17 || j == 18)) {
+				continue;
+			}
 			Msg.Append(pString);
 		}
 	}
 	LCDWrite(Msg);
-
-	//   KompleteKontrolScreenCommand tmp;
-	//   for (size_t row = 0; row < 4; row++) {
-	//     for (size_t column = 0; column < 4; column++) {
-	//       tmp.lengthRow = 1;
-	//       tmp.lengthCol = 32;
-	//       tmp.offsetRow = row;
-	//       tmp.offsetCol = column * 32;
-	//       memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
-	//       m_KompleteKontrol->SendScreen(&tmp);
-	//     }
-	//   }
-	// }
 }
 
 void CUserInterface::LCDWrite (const char *pString)
