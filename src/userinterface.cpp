@@ -174,19 +174,19 @@ bool CUserInterface::Initialize (void)
 	}
 
 	m_pUIButtons = new CUIButtons (
-                                    m_pConfig->GetButtonPinPreview (), m_pConfig->GetButtonActionPreview (),
+                  m_pConfig->GetButtonPinPreview (), m_pConfig->GetButtonActionPreview (),
 									m_pConfig->GetButtonPinLeft (), m_pConfig->GetButtonActionRight (),
 									m_pConfig->GetButtonPinRight (), m_pConfig->GetButtonActionRight (),
 									m_pConfig->GetButtonPinData (), m_pConfig->GetButtonActionData (),
 									m_pConfig->GetButtonPinToneSelect (), m_pConfig->GetButtonActionToneSelect (),
-                                    m_pConfig->GetButtonPinPatchPerform (), m_pConfig->GetButtonActionPatchPerform (),
+                  m_pConfig->GetButtonPinPatchPerform (), m_pConfig->GetButtonActionPatchPerform (),
 									m_pConfig->GetButtonPinEdit (), m_pConfig->GetButtonActionEdit (),
 									m_pConfig->GetButtonPinSystem (), m_pConfig->GetButtonActionSystem (),
 									m_pConfig->GetButtonPinRhythm (), m_pConfig->GetButtonActionRhythm (),
 									m_pConfig->GetButtonPinUtility (), m_pConfig->GetButtonActionUtility (),
-                                    m_pConfig->GetButtonPinMute (), m_pConfig->GetButtonActionMute (),
-                                    m_pConfig->GetButtonPinMonitor (), m_pConfig->GetButtonActionMonitor (),
-                                    m_pConfig->GetButtonPinCompare (), m_pConfig->GetButtonActionCompare (),
+                  m_pConfig->GetButtonPinMute (), m_pConfig->GetButtonActionMute (),
+                  m_pConfig->GetButtonPinMonitor (), m_pConfig->GetButtonActionMonitor (),
+                  m_pConfig->GetButtonPinCompare (), m_pConfig->GetButtonActionCompare (),
 									m_pConfig->GetButtonPinEnter (), m_pConfig->GetButtonActionEnter (),
 									m_pConfig->GetDoubleClickTimeout (), m_pConfig->GetLongPressTimeout ()
 								  );
@@ -271,7 +271,7 @@ void CUserInterface::Process (void)
 			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
 			std::string str(1, ch);
 			const char *pString = str.c_str();
-			if (i == 0 && (j == 1 || j == 4 || j == 22 || j == 23)) {
+			if (i == 0 && (j == 5 || j == 14 || j == 22 || j == 23)) {
 				continue;
 			}
 			if (i == 1 && (j == 10 || j == 12 || j == 17 || j == 18)) {

@@ -54,10 +54,10 @@ public:
 		BtnEventEdit = 7,
 		BtnEventSystem = 8,
 		BtnEventRhythm = 9,
-        BtnEventUtility = 10,
-        BtnEventMute = 11,
-        BtnEventMonitor = 12,
-        BtnEventCompare = 13,
+		BtnEventUtility = 10,
+		BtnEventMute = 11,
+		BtnEventMonitor = 12,
+		BtnEventCompare = 13,
 		BtnEventEnter = 14,
 		BtnEventUnknown = 15
 	};
@@ -121,10 +121,10 @@ public:
 			unsigned editPin, const char *editAction,
 			unsigned systemPin, const char *systemAction,
 			unsigned rhythmPin, const char *rhythmAction,
-            unsigned utilityPin, const char *utilityAction,
-            unsigned mutePin, const char *muteAction,
-            unsigned monitorPin, const char *monitorAction,
-            unsigned comparePin, const char *compareAction,
+			unsigned utilityPin, const char *utilityAction,
+			unsigned mutePin, const char *muteAction,
+			unsigned monitorPin, const char *monitorAction,
+			unsigned comparePin, const char *compareAction,
 			unsigned enterPin, const char *enterAction,
 			unsigned doubleClickTimeout, unsigned longPressTimeout
 	);
@@ -166,14 +166,14 @@ private:
 	CUIButton::BtnTrigger m_systemAction;
 	unsigned m_rhythmPin;
 	CUIButton::BtnTrigger m_rhythmAction;
-    unsigned m_utilityPin;
-    CUIButton::BtnTrigger m_utilityAction;
-    unsigned m_mutePin;
-    CUIButton::BtnTrigger m_muteAction;
-    unsigned m_monitorPin;
-    CUIButton::BtnTrigger m_monitorAction;
-    unsigned m_comparePin;
-    CUIButton::BtnTrigger m_compareAction;
+	unsigned m_utilityPin;
+	CUIButton::BtnTrigger m_utilityAction;
+	unsigned m_mutePin;
+	CUIButton::BtnTrigger m_muteAction;
+	unsigned m_monitorPin;
+	CUIButton::BtnTrigger m_monitorAction;
+	unsigned m_comparePin;
+	CUIButton::BtnTrigger m_compareAction;
 	unsigned m_enterPin;
 	CUIButton::BtnTrigger m_enterAction;
 

@@ -236,43 +236,29 @@ CUIButtons::CUIButtons (
 			unsigned editPin, const char *editAction,
 			unsigned systemPin, const char *systemAction,
 			unsigned rhythmPin, const char *rhythmAction,
-            unsigned utilityPin, const char *utilityAction,
-            unsigned mutePin, const char *muteAction,
-            unsigned monitorPin, const char *monitorAction,
-            unsigned comparePin, const char *compareAction,
+			unsigned utilityPin, const char *utilityAction,
+			unsigned mutePin, const char *muteAction,
+			unsigned monitorPin, const char *monitorAction,
+			unsigned comparePin, const char *compareAction,
 			unsigned enterPin, const char *enterAction,
 			unsigned doubleClickTimeout, unsigned longPressTimeout
 )
 :	m_doubleClickTimeout(doubleClickTimeout),
 	m_longPressTimeout(longPressTimeout),
-	m_previewPin(previewPin),
-	m_previewAction(CUIButton::triggerTypeFromString(previewAction)),
-	m_leftPin(leftPin),
-	m_leftAction(CUIButton::triggerTypeFromString(leftAction)),
-	m_rightPin(rightPin),
-	m_rightAction(CUIButton::triggerTypeFromString(rightAction)),
-	m_dataPin(dataPin),
-	m_dataAction(CUIButton::triggerTypeFromString(dataAction)),
-	m_toneSelectPin(toneSelectPin),
-	m_toneSelectAction(CUIButton::triggerTypeFromString(toneSelectAction)),
-	m_patchPerformPin(patchPerformPin),
-	m_patchPerformAction(CUIButton::triggerTypeFromString(patchPerformAction)),
-	m_editPin(editPin),
-	m_editAction(CUIButton::triggerTypeFromString(editAction)),
-	m_systemPin(systemPin),
-	m_systemAction(CUIButton::triggerTypeFromString(systemAction)),
-	m_rhythmPin(rhythmPin),
-	m_rhythmAction(CUIButton::triggerTypeFromString(rhythmAction)),
-	m_utilityPin(utilityPin),
-    m_utilityAction(CUIButton::triggerTypeFromString(utilityAction)),
-    m_mutePin(mutePin),
-    m_muteAction(CUIButton::triggerTypeFromString(muteAction)),
-    m_monitorPin(monitorPin),
-    m_monitorAction(CUIButton::triggerTypeFromString(monitorAction)),
-    m_comparePin(comparePin),
-    m_compareAction(CUIButton::triggerTypeFromString(compareAction)),
-	m_enterPin(enterPin),
-	m_enterAction(CUIButton::triggerTypeFromString(enterAction)),
+	m_previewPin(previewPin), m_previewAction(CUIButton::triggerTypeFromString(previewAction)),
+	m_leftPin(leftPin), m_leftAction(CUIButton::triggerTypeFromString(leftAction)),
+	m_rightPin(rightPin), m_rightAction(CUIButton::triggerTypeFromString(rightAction)),
+	m_dataPin(dataPin), m_dataAction(CUIButton::triggerTypeFromString(dataAction)),
+	m_toneSelectPin(toneSelectPin), m_toneSelectAction(CUIButton::triggerTypeFromString(toneSelectAction)),
+	m_patchPerformPin(patchPerformPin), m_patchPerformAction(CUIButton::triggerTypeFromString(patchPerformAction)),
+	m_editPin(editPin), m_editAction(CUIButton::triggerTypeFromString(editAction)),
+	m_systemPin(systemPin), m_systemAction(CUIButton::triggerTypeFromString(systemAction)),
+	m_rhythmPin(rhythmPin), m_rhythmAction(CUIButton::triggerTypeFromString(rhythmAction)),
+	m_utilityPin(utilityPin), m_utilityAction(CUIButton::triggerTypeFromString(utilityAction)),
+	m_mutePin(mutePin), m_muteAction(CUIButton::triggerTypeFromString(muteAction)),
+	m_monitorPin(monitorPin), m_monitorAction(CUIButton::triggerTypeFromString(monitorAction)),
+	m_comparePin(comparePin), m_compareAction(CUIButton::triggerTypeFromString(compareAction)),
+	m_enterPin(enterPin), m_enterAction(CUIButton::triggerTypeFromString(enterAction)),
 	m_eventHandler (0),
 	m_lastTick (0)
 {
@@ -304,14 +290,15 @@ boolean CUIButtons::Initialize (void)
 	// longpress. We may not initialise all of the buttons.
 	// MIDI buttons only support a single click.
 	unsigned pins[MAX_BUTTONS] = {
-		m_previewPin, m_leftPin, m_rightPin, m_dataPin, m_toneSelectPin, m_patchPerformPin,  m_editPin,  m_systemPin,  m_rhythmPin, 
-		m_utilityPin, m_mutePin, m_monitorPin, m_comparePin
+		m_previewPin, m_leftPin, m_rightPin, m_dataPin, m_toneSelectPin,
+		m_patchPerformPin,  m_editPin,  m_systemPin,  m_rhythmPin, 
+		m_utilityPin, m_mutePin, m_monitorPin, m_comparePin, m_enterPin,
 	};
 	CUIButton::BtnTrigger triggers[MAX_BUTTONS] = {
 		// Normal buttons
 		m_previewAction, m_leftAction, m_rightAction, m_dataAction, m_toneSelectAction,
-		m_patchPerformAction, m_editAction, m_systemAction, m_rhythmAction, m_utilityAction,
-		m_muteAction, m_monitorAction, m_compareAction
+		m_patchPerformAction, m_editAction, m_systemAction, m_rhythmAction,
+		m_utilityAction, m_muteAction, m_monitorAction, m_compareAction, m_enterAction,
 	};
 	CUIButton::BtnEvent events[MAX_BUTTONS] = {
 		// Normal buttons
@@ -325,9 +312,9 @@ boolean CUIButtons::Initialize (void)
 		CUIButton::BtnEventSystem,
 		CUIButton::BtnEventRhythm,
 		CUIButton::BtnEventUtility,
-        CUIButton::BtnEventMute,
-        CUIButton::BtnEventMonitor,
-        CUIButton::BtnEventCompare,
+		CUIButton::BtnEventMute,
+		CUIButton::BtnEventMonitor,
+		CUIButton::BtnEventCompare,
 		CUIButton::BtnEventEnter,
 	};
 
