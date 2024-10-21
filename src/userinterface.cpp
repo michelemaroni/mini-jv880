@@ -241,27 +241,27 @@ void CUserInterface::Process (void)
 	{
 		m_pUIButtons->Update();
 	}
-	for (size_t y = 0; y < 32; y++) {
-      for (size_t x = 0; x < 128; x++) {
-        int destX = (int)(((float)x / 128) * 820);
-        int destY = (int)(((float)y / 32) * 100);
-        int sum = 0;
-        for (int py = -1; py <= 1; py++) {
-          for (int px = -1; px <= 1; px++) {
-            if ((destY + py) >= 0 && (destX + px) >= 0) {
-              bool pixel = m_pMiniJV880->mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
-              sum += pixel;
-            }
-          }
-        }
+	// for (size_t y = 0; y < 32; y++) {
+  //     for (size_t x = 0; x < 128; x++) {
+  //       int destX = (int)(((float)x / 128) * 820);
+  //       int destY = (int)(((float)y / 32) * 100);
+  //       int sum = 0;
+  //       for (int py = -1; py <= 1; py++) {
+  //         for (int px = -1; px <= 1; px++) {
+  //           if ((destY + py) >= 0 && (destX + px) >= 0) {
+  //             bool pixel = m_pMiniJV880->mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
+  //             sum += pixel;
+  //           }
+  //         }
+  //       }
 
-        bool pixel = sum > 0;
-        // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
-        set_pixel(screen_buffer, x, y, pixel);
-		// LCDScreenWrite(screen_buffer);
-        // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
-      }
-    }
+  //       bool pixel = sum > 0;
+  //       // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
+  //       set_pixel(screen_buffer, x, y, pixel);
+	// 			// LCDScreenWrite(screen_buffer);
+  //       // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
+  //     }
+  //   }
 
 	CString Msg ("\x1B[H\E[?25l");
 	for (int i = 0; i < 2; i++)
