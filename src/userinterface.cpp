@@ -386,18 +386,39 @@ void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 		btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
 	}
 	if (Event == CUIButton::BtnEventEdit) {
-		// TODO: map MCU keys
+		btn |= 1 << MCU_BUTTON_EDIT;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_EDIT);
 	}
 	if (Event == CUIButton::BtnEventSystem) {
-		// TODO: map MCU keys
+		btn |= 1 << MCU_BUTTON_SYSTEM;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_SYSTEM);
 	}
 	if (Event == CUIButton::BtnEventRhythm) {
-		// TODO: map MCU keys
+		btn |= 1 << MCU_BUTTON_RHYTHM;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_RHYTHM);
 	}
 	if (Event == CUIButton::BtnEventUtility) {
 		btn |= 1 << MCU_BUTTON_UTILITY;
 	} else {
 		btn &= ~(1 << MCU_BUTTON_UTILITY);
+	}
+	if (Event == CUIButton::BtnEventMute) {
+			btn |= 1 << MCU_BUTTON_MUTE;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_MUTE);
+	}
+	if (Event == CUIButton::BtnEventMonitor) {
+		btn |= 1 << MCU_BUTTON_MONITOR;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_MONITOR);
+	}
+	if (Event == CUIButton::BtnEventCompare) {
+		btn |= 1 << MCU_BUTTON_COMPARE;
+	} else {
+		btn &= ~(1 << MCU_BUTTON_COMPARE);
 	}
 	if (Event == CUIButton::BtnEventEnter) {
 		btn |= 1 << MCU_BUTTON_ENTER;
