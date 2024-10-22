@@ -354,79 +354,55 @@ void CUserInterface::EncoderEventStub (CKY040::TEvent Event, void *pParam)
 
 void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 {
-	uint32_t btn = 0;
-	if (Event == CUIButton::BtnEventPreview) {
-		btn |= 1 << MCU_BUTTON_PREVIEW;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_PREVIEW);
+	uint8_t btn = 100;
+	switch(Event) {
+		case CUIButton::BtnEventPreview:
+			btn = MCU_BUTTON_PREVIEW;
+			break;
+		case CUIButton::BtnEventLeft:
+			btn = MCU_BUTTON_CURSOR_L;
+			break;
+		case CUIButton::BtnEventRight:
+			btn =MCU_BUTTON_CURSOR_R;
+			break;
+		case CUIButton::BtnEventData:
+			btn = MCU_BUTTON_DATA;
+			break;
+		case CUIButton::BtnEventToneSelect:
+			btn = MCU_BUTTON_TONE_SELECT;
+			break;
+		case CUIButton::BtnEventPatchPerform:
+			btn = MCU_BUTTON_PATCH_PERFORM;
+			break;
+		case CUIButton::BtnEventEdit:
+			btn = MCU_BUTTON_EDIT;
+			break;
+		case CUIButton::BtnEventSystem:
+			btn = MCU_BUTTON_SYSTEM;
+			break;
+		case CUIButton::BtnEventRhythm:
+			btn = MCU_BUTTON_RHYTHM;
+			break;
+		case CUIButton::BtnEventUtility:
+			btn = MCU_BUTTON_UTILITY;
+			break;
+		case CUIButton::BtnEventMute:
+			btn = MCU_BUTTON_MUTE;
+			break;
+		case CUIButton::BtnEventMonitor:
+			btn = MCU_BUTTON_MONITOR;
+			break;
+		case CUIButton::BtnEventCompare:
+			btn = MCU_BUTTON_COMPARE;
+			break;
+		case CUIButton::BtnEventEnter:
+			btn = MCU_BUTTON_ENTER;
+			break;
 	}
-	if (Event == CUIButton::BtnEventLeft) {
-		btn |= 1 << MCU_BUTTON_CURSOR_L;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_CURSOR_L);
+	if (btn < 100) {
+		m_pMiniJV880->mcu.lcd.LCD_SendButton(btn, 1);
+		LOGNOTE("Button pressed: %x", m_pMiniJV880->mcu.mcu_button_pressed);
 	}
-	if (Event == CUIButton::BtnEventRight) {
-		btn |= 1 << MCU_BUTTON_CURSOR_R;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_CURSOR_R);
-	}
-	if (Event == CUIButton::BtnEventData) {
-		btn |= 1 << MCU_BUTTON_DATA;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_DATA);
-	}
-	if (Event == CUIButton::BtnEventToneSelect) {
-		btn |= 1 << MCU_BUTTON_TONE_SELECT;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
-	}
-	if (Event == CUIButton::BtnEventPatchPerform) {
-		btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
-	}
-	if (Event == CUIButton::BtnEventEdit) {
-		btn |= 1 << MCU_BUTTON_EDIT;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_EDIT);
-	}
-	if (Event == CUIButton::BtnEventSystem) {
-		btn |= 1 << MCU_BUTTON_SYSTEM;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_SYSTEM);
-	}
-	if (Event == CUIButton::BtnEventRhythm) {
-		btn |= 1 << MCU_BUTTON_RHYTHM;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_RHYTHM);
-	}
-	if (Event == CUIButton::BtnEventUtility) {
-		btn |= 1 << MCU_BUTTON_UTILITY;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_UTILITY);
-	}
-	if (Event == CUIButton::BtnEventMute) {
-			btn |= 1 << MCU_BUTTON_MUTE;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_MUTE);
-	}
-	if (Event == CUIButton::BtnEventMonitor) {
-		btn |= 1 << MCU_BUTTON_MONITOR;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_MONITOR);
-	}
-	if (Event == CUIButton::BtnEventCompare) {
-		btn |= 1 << MCU_BUTTON_COMPARE;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_COMPARE);
-	}
-	if (Event == CUIButton::BtnEventEnter) {
-		btn |= 1 << MCU_BUTTON_ENTER;
-	} else {
-		btn &= ~(1 << MCU_BUTTON_ENTER);
-	}
-	LOGNOTE("Button: %x", btn);
-	m_pMiniJV880->mcu.mcu_button_pressed = btn;
 }
 
 void CUserInterface::UIButtonsEventStub (CUIButton::BtnEvent Event, void *pParam)
