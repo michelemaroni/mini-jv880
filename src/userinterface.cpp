@@ -225,7 +225,7 @@ bool CUserInterface::Initialize (void)
 
 void CUserInterface::Process (void)
 {
-	uint32_t* lcd_buffer = m_pMiniJV880->mcu->lcd.LCD_Update();
+	uint32_t* lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
 
 	// for (size_t y = 0; y < lcd_height; y++) {
 	// 	for (size_t x = 0; x < lcd_width; x++) {
@@ -268,7 +268,7 @@ void CUserInterface::Process (void)
 	{
 		for (int j = 0; j < 24; j++)
 		{
-			uint8_t ch = m_pMiniJV880->mcu->lcd.LCD_Data[i * 40 + j];
+			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
 			std::string str(1, ch);
 			const char *pString = str.c_str();
 			if (i == 0 && (j == 5 || j == 14 || j == 22 || j == 23)) {
@@ -318,7 +318,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 			// triggered after the encoder is rotated
 			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
-      m_pMiniJV880->mcu->MCU_EncoderTrigger(1);
+      m_pMiniJV880->mcu.MCU_EncoderTrigger(1);
     }
 		break;
 
@@ -326,7 +326,7 @@ void CUserInterface::EncoderEventHandler (CKY040::TEvent Event)
 		if (m_bSwitchPressed) {
 			m_pUIButtons->ResetButton(m_pConfig->GetButtonPinEnter());
 		} else {
-			m_pMiniJV880->mcu->MCU_EncoderTrigger(0);
+			m_pMiniJV880->mcu.MCU_EncoderTrigger(0);
 		}
 		break;
 
@@ -426,7 +426,7 @@ void CUserInterface::UIButtonsEventHandler (CUIButton::BtnEvent Event)
 		btn &= ~(1 << MCU_BUTTON_ENTER);
 	}
 	LOGNOTE("Button: %x", btn);
-	m_pMiniJV880->mcu->mcu_button_pressed = btn;
+	m_pMiniJV880->mcu.mcu_button_pressed = btn;
 }
 
 void CUserInterface::UIButtonsEventStub (CUIButton::BtnEvent Event, void *pParam)
