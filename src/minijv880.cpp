@@ -221,26 +221,26 @@ void CMiniJV880::Run(unsigned nCore) {
 
         nSamples = (int)nFrames * 2;
         // Try on single core only RPi4
-        mcu.updateSC55(nSamples);
+        // mcu.updateSC55(nSamples);
 
-        // mcu.sample_write_ptr = 0;
-        // while (mcu.sample_write_ptr < nSamples) {
-        //   if (!mcu.mcu.ex_ignore)
-        //     mcu.MCU_Interrupt_Handle();
-        //   else
-        //     mcu.mcu.ex_ignore = 0;
+        mcu.sample_write_ptr = 0;
+        while (mcu.sample_write_ptr < nSamples) {
+          if (!mcu.mcu.ex_ignore)
+            mcu.MCU_Interrupt_Handle();
+          else
+            mcu.mcu.ex_ignore = 0;
 
-        //   if (!mcu.mcu.sleep)
-        //     mcu.MCU_ReadInstruction();
+          if (!mcu.mcu.sleep)
+            mcu.MCU_ReadInstruction();
 
-        //   mcu.mcu.cycles += 12; // FIXME: assume 12 cycles per instruction
+          mcu.mcu.cycles += 12; // FIXME: assume 12 cycles per instruction
 
-        //   mcu.TIMER_Clock(mcu.mcu.cycles);
-        //   mcu.MCU_UpdateUART_RX();
-        //   mcu.MCU_UpdateUART_TX();
-        //   mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
-        //   // mcu.pcm.PCM_Update(mcu.mcu.cycles);
-        // }
+          mcu.TIMER_Clock(mcu.mcu.cycles);
+          mcu.MCU_UpdateUART_RX();
+          mcu.MCU_UpdateUART_TX();
+          mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
+          // mcu.pcm.PCM_Update(mcu.mcu.cycles);
+        }
 
         // unsigned int endT = CTimer::GetClockTicks();
         // avg = avg == 0 ? (endT - startT) : avg * 0.99 + (endT - startT) *
@@ -262,7 +262,7 @@ void CMiniJV880::Run(unsigned nCore) {
       // while (mcu.sample_write_ptr >= nSamples) {
       // }
       // Try on single core only RPi4
-      // mcu.pcm.PCM_Update(mcu.mcu.cycles);
+      mcu.pcm.PCM_Update(mcu.mcu.cycles);
     }
   }
 }
