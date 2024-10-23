@@ -129,7 +129,7 @@ bool CMiniJV880::Initialize(void) {
   f_close(&f);
   LOGNOTE("Emu files loaded");
 
-  int ret = mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
+  int ret = mcu->startSC55(rom1, rom2, pcm1, pcm2, nvram);
   LOGNOTE("startSC55 returned: %d", ret);
   free(rom1);
   free(rom2);
@@ -184,7 +184,7 @@ void CMiniJV880::USBMIDIMessageHandler(unsigned nCable, u8 *pPacket,
                                        unsigned nLength) {
   // LOGERR("CMiniJV880::USBMIDIMessageHandler");
   CMiniJV880 *pThis = static_cast<CMiniJV880 *>(s_pThis);
-  pThis->mcu.postMidiSC55(pPacket, nLength);
+  pThis->mcu->postMidiSC55(pPacket, nLength);
 }
 
 void CMiniJV880::DeviceRemovedHandler(CDevice *pDevice, void *pContext) {
@@ -221,7 +221,7 @@ void CMiniJV880::Run(unsigned nCore) {
 
         nSamples = (int)nFrames * 2;
         // Try on single core only RPi4
-        mcu.updateSC55(nSamples);
+        mcu->updateSC55(nSamples);
 
         // mcu.sample_write_ptr = 0;
         // while (mcu.sample_write_ptr < nSamples) {
@@ -250,7 +250,7 @@ void CMiniJV880::Run(unsigned nCore) {
         // }
 
         int len = nSamples * sizeof(int16_t);
-        if (m_pSoundDevice->Write(mcu.sample_buffer, len) != len) {
+        if (m_pSoundDevice->Write(mcu->sample_buffer, len) != len) {
           LOGERR("Sound data dropped");
         }
       }

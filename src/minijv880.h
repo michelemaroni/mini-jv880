@@ -54,7 +54,7 @@ public:
                                     unsigned nLength);
   static void DeviceRemovedHandler(CDevice *pDevice, void *pContext);
 
-  MCU mcu;
+  MCU *mcu;
 
   CScreenDevice *screenUnbuffered;
 
