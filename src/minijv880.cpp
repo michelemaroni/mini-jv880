@@ -239,7 +239,7 @@ void CMiniJV880::Run(unsigned nCore) {
           mcu.MCU_UpdateUART_RX();
           mcu.MCU_UpdateUART_TX();
           mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
-          // mcu.pcm.PCM_Update(mcu.mcu.cycles);
+          mcu.pcm.PCM_Update(mcu.mcu.cycles);
         }
 
         // unsigned int endT = CTimer::GetClockTicks();
@@ -258,11 +258,11 @@ void CMiniJV880::Run(unsigned nCore) {
     // LOGNOTE("%d samples in %d time", nFrames, m_GetChunkTimer);
   } else if (nCore == 3) {
     // pcm chip
-    while (true) {
-      // while (mcu.sample_write_ptr >= nSamples) {
-      // }
-      // Try on single core only RPi4
-      mcu.pcm.PCM_Update(mcu.mcu.cycles);
-    }
+    // while (true) {
+    //   // while (mcu.sample_write_ptr >= nSamples) {
+    //   // }
+    //   // Try on single core only RPi4
+    //   mcu.pcm.PCM_Update(mcu.mcu.cycles);
+    // }
   }
 }
