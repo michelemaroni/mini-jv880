@@ -258,7 +258,7 @@ void CUserInterface::Process (void)
   //       bool pixel = sum > 0;
   //       // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
   //       set_pixel(screen_buffer, x, y, pixel);
-	// 			// LCDScreenWrite(screen_buffer);
+	//
   //       // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
   //     }
   //   }
@@ -288,14 +288,6 @@ void CUserInterface::LCDWrite (const char *pString)
 	if (m_pLCDBuffered)
 	{
 		m_pLCDBuffered->Write (pString, strlen (pString));
-	}
-}
-
-void CUserInterface::LCDScreenWrite(const void *pBuffer)
-{
-	if (m_pLCDBuffered)
-	{
-		m_pLCDBuffered->Write (pBuffer, 128 * 32);
 	}
 }
 
