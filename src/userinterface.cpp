@@ -227,11 +227,11 @@ void CUserInterface::Process (void)
 {
 	uint32_t* lcd_buffer = m_pMiniJV880->mcu.lcd.LCD_Update();
 
-	for (size_t y = 0; y < lcd_height; y++) {
-		for (size_t x = 0; x < lcd_width; x++) {
-			m_pMiniJV880->screenUnbuffered->SetPixel(x + 700, y + 50, lcd_buffer[y * lcd_width + x]);
-		}
-	}
+	// for (size_t y = 0; y < lcd_height; y++) {
+	// 	for (size_t x = 0; x < lcd_width; x++) {
+	// 		m_pMiniJV880->screenUnbuffered->SetPixel(x + 700, y + 50, lcd_buffer[y * lcd_width + x]);
+	// 	}
+	// }
 
 	if (m_pLCDBuffered)
 	{
@@ -274,7 +274,7 @@ void CUserInterface::Process (void)
 			if (i == 0 && (j == 5 || j == 14 || j == 22 || j == 23)) {
 				continue;
 			}
-			if (i == 1 && (j == 10 || j == 12 || j == 17 || j == 18)) {
+			if (i == 1 && (j == 12 || j == 17 || j == 18 || j == 23)) {
 				continue;
 			}
 			Msg.Append(pString);
