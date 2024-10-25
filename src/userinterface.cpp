@@ -277,7 +277,14 @@ void CUserInterface::Process (void)
 			if (i == 1 && (j == 12 || j == 17 || j == 18 || j == 23)) {
 				continue;
 			}
-			Msg.Append(pString);
+			int jj = m_pMiniJV880->mcu.lcd.LCD_DD_RAM % 0x40;
+    	int ii = m_pMiniJV880->mcu.lcd.LCD_DD_RAM / 0x40;
+			if (ii < 2 && jj < 24 && m_pMiniJV880->mcu.lcd.LCD_C) {
+				// cursor
+				Msg.Append("_");
+			} else {
+				Msg.Append(pString);
+			}
 		}
 	}
 	LCDWrite(Msg);
