@@ -123,9 +123,9 @@ void Pcm::PCM_Write(uint32_t address, uint8_t data)
             if ((address & 4) == 0)
                 ix |= 2;
 
-            pcm_lock.Acquire();
+            // pcm_lock.Acquire();
             pcm.ram1[pcm.select_channel][ix] = pcm.write_latch;
-            pcm_lock.Release();
+            // pcm_lock.Release();
         }
     }
     else if ((address >= 0x10 && address < 0x20) || (address >= 0x30 && address < 0x38))
@@ -147,9 +147,9 @@ void Pcm::PCM_Write(uint32_t address, uint8_t data)
             if (address & 32)
                 ix |= 8;
 
-            pcm_lock.Acquire();
+            // pcm_lock.Acquire();
             pcm.ram2[pcm.select_channel][ix] = pcm.write_latch;
-            pcm_lock.Release();
+            // pcm_lock.Release();
         }
     }
 }
@@ -170,7 +170,7 @@ uint8_t Pcm::PCM_Read(uint32_t address)
     }
     else if (address == 0x3c || address == 0x3e) // status
     {
-        pcm_lock.Acquire();
+        // pcm_lock.Acquire();
         uint8_t status = 0;
         if (address == 0x3e && pcm.irq_assert)
         {
@@ -181,7 +181,7 @@ uint8_t Pcm::PCM_Read(uint32_t address)
         status |= pcm.irq_channel;
         if (pcm.voice_mask_updating)
             status |= 32;
-        pcm_lock.Release();
+        // pcm_lock.Release();
 
         return status;
     }
@@ -426,7 +426,7 @@ void Pcm::PCM_Update(uint64_t cycles)
     int voice_active = pcm.voice_mask & pcm.voice_mask_pending;
     while (pcm.cycles < cycles)
     {
-        pcm_lock.Acquire();
+        // pcm_lock.Acquire();
 
         int tt[2] = {};
 
@@ -1421,7 +1421,7 @@ void Pcm::PCM_Update(uint64_t cycles)
             pcm.ram2[31][7] |= 0x20;
         }
 
-        pcm_lock.Release();
+        // pcm_lock.Release();
 
         pcm.nfs = 1;
 
