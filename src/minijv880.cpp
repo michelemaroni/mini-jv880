@@ -211,6 +211,7 @@ void CMiniJV880::Run(unsigned nCore) {
     //     m_pMIDIDevice->hostDevice->Update();
     //   }
     // }
+    return;
   } else if (nCore == 2) {
     // emulator
     while (true) {
@@ -264,5 +265,6 @@ void CMiniJV880::Run(unsigned nCore) {
     //   // Try on single core only RPi4
     //   mcu.pcm.PCM_Update(mcu.mcu.cycles);
     // }
+    return;
   }
 }
