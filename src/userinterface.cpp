@@ -71,7 +71,7 @@ bool CUserInterface::Initialize (void)
 		unsigned ssd1306addr = m_pConfig->GetSSD1306LCDI2CAddress ();
 		bool st7789 = m_pConfig->GetST7789Enabled ();
 		if (ssd1306addr != 0) {
-			m_pSSD1306 = new CSSD1306Device (m_pConfig->GetSSD1306LCDWidth (), m_pConfig->GetSSD1306LCDHeight (),
+			m_pSSD1306 = new CSSD1306Dev (m_pConfig->GetSSD1306LCDWidth (), m_pConfig->GetSSD1306LCDHeight (),
 											 m_pI2CMaster, ssd1306addr,
 											 m_pConfig->GetSSD1306LCDRotate (), m_pConfig->GetSSD1306LCDMirror ());
 			if (!m_pSSD1306->Initialize ())
