@@ -1263,8 +1263,9 @@ void Pcm::PCM_Update(uint64_t cycles)
                 int v2 = reg3 + (mult1 >> 6) + ((mult1 >> 5) & 1); // 9
                 int v1 = v2 + (mult2 >> 13) + ((mult2 >> 12) & 1); // 10
                 int subvar = v1 + (mult3 >> 6) + ((mult3 >> 5) & 1); // 11
+#define Clamp(v, x0, x1) (v < x0 ? x0 : v > x1 ? x1 : v)
 
-                ram1[3] = v1;
+                ram1[3] = Clamp(v1, -0x80000, 0x7ffff);
 
                 int tests = test;
                 tests <<= 12;
@@ -1277,7 +1278,7 @@ void Pcm::PCM_Update(uint64_t cycles)
                 int v4 = reg1 + (mult4 >> 6) + ((mult4 >> 5) & 1); // 14
                 int v5 = v4 + (mult5 >> 13) + ((mult5 >> 12) & 1); // 15
 
-                ram1[1] = v5;
+                ram1[1] = Clamp(v5, -0x80000, 0x7ffff);
             }
 
 
