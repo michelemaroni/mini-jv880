@@ -262,15 +262,15 @@ void CUserInterface::Process (void)
   //       // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
   //     }
   //   }
-	int displayCols = 20;
+	int displayCols = m_pConfig->GetLCDColumns();
 	CString Msg ("\x1B[H\E[?25l");
 	for (int i = 0; i < 2; i++)
 	{
 		unsigned long currentTime = CTimer::GetClockTicks();
 		// Update scroll position every SCROLL_INTERVAL microseconds
 		if (currentTime - m_lastScrollTime >= SCROLL_INTERVAL) {
-				m_scrollPosition[0] = (m_scrollPosition[0] + 1) % (ACTUAL_COLS - displayCols + 1);  // Scroll positions 0-3 for first row
-				m_scrollPosition[1] = (m_scrollPosition[1] + 1) % (ACTUAL_COLS - displayCols + 1);  // Scroll positions 0-3 for second row
+				m_scrollPosition[0] = (m_scrollPosition[0] + 1) % (ACTUAL_COLS - displayCols + 1);
+				m_scrollPosition[1] = (m_scrollPosition[1] + 1) % (ACTUAL_COLS - displayCols + 1);
 				m_lastScrollTime = currentTime;
 		}
 		// Calculate starting position for this row
