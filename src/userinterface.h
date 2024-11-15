@@ -79,7 +79,7 @@ private:
 
 	unsigned long m_lastScrollTime = 0;
 
-	static const unsigned long SCROLL_INTERVAL = 500;
+	static const unsigned long SCROLL_INTERVAL = 500000;
 
 	static const int ACTUAL_COLS = 24;
 };
