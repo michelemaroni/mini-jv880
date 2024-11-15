@@ -266,17 +266,22 @@ void CUserInterface::Process (void)
 	CString Msg ("\x1B[H\E[?25l");
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < 24; j++)
+		unsigned long currentTime = CTimer::GetClockTicks();
+		// Update scroll position every SCROLL_INTERVAL milliseconds
+		if (currentTime - m_lastScrollTime >= SCROLL_INTERVAL) {
+				m_scrollPosition[0] = (m_scrollPosition[0] + 1) % 4;  // Scroll positions 0-3 for first row
+				m_scrollPosition[1] = (m_scrollPosition[1] + 1) % 4;  // Scroll positions 0-3 for second row
+				m_lastScrollTime = currentTime;
+		}
+		// Calculate starting position for this row
+    int startPos = m_scrollPosition[i];
+		for (int j = 0; j < 20; j++)
 		{
-			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + j];
+			int sourcePos = (j + startPos) % ACTUAL_COLS;
+			uint8_t ch = m_pMiniJV880->mcu.lcd.LCD_Data[i * 40 + sourcePos];
 			std::string str(1, ch);
 			const char *pString = str.c_str();
-			if (i == 0 && (j == 5 || j == 14 || j == 22 || j == 23)) {
-				continue;
-			}
-			if (i == 1 && (j == 12 || j == 17 || j == 18 || j == 23)) {
-				continue;
-			}
+
 			int jj = m_pMiniJV880->mcu.lcd.LCD_DD_RAM % 0x40;
     	int ii = m_pMiniJV880->mcu.lcd.LCD_DD_RAM / 0x40;
 			if (i == ii && j == jj && ii < 2 && jj < 24 && m_pMiniJV880->mcu.lcd.LCD_C) {
