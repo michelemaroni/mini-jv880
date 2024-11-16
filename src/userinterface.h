@@ -74,6 +74,14 @@ private:
 	u8 *screen_buffer;
 
 	unsigned m_lastTick;
+
+	int m_scrollPosition[2] = {0, 0};
+
+	unsigned long m_lastScrollTime = 0;
+
+	static const unsigned long SCROLL_INTERVAL = 500000;
+
+	static const int ACTUAL_COLS = 24;
 };
 
 #endif
