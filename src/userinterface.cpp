@@ -270,26 +270,27 @@ void CUserInterface::Process (void)
 
 		// Handle scrolling and pausing logic
     if (currentTime - m_lastScrollTime >= SCROLL_INTERVAL) {
-      for (int r = 0; r < 2; r++) {
+			for (int r = 0; r < 2; r++) {
 				if (isPaused[r]) {
 					// Check if pause duration has elapsed
 					if (currentTime - pauseStartTime[r] >= PAUSE_DURATION) {
 						isPaused[r] = false;
+						if (isAtEnd[r]) {
+							// Reset to beginning after pause at end
+							m_scrollPosition[r] = 0;
+							isAtEnd[r] = false;
+							isPaused[r] = true;  // Pause again at start
+							pauseStartTime[r] = currentTime;
+						}
 					}
 				} else {
 					// Update scroll position
 					m_scrollPosition[r]++;
-
 					// Check if we've reached the end
 					if (m_scrollPosition[r] >= ACTUAL_COLS - displayCols) {
 						m_scrollPosition[r] = ACTUAL_COLS - displayCols;
 						isPaused[r] = true;
-						pauseStartTime[r] = currentTime;
-					}
-					// Check if we need to reset to beginning
-					else if (m_scrollPosition[r] > ACTUAL_COLS - displayCols) {
-						m_scrollPosition[r] = 0;
-						isPaused[r] = true;
+						isAtEnd[r] = true;
 						pauseStartTime[r] = currentTime;
 					}
 				}
