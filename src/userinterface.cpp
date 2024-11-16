@@ -267,12 +267,37 @@ void CUserInterface::Process (void)
 	for (int i = 0; i < 2; i++)
 	{
 		unsigned long currentTime = CTimer::GetClockTicks();
-		// Update scroll position every SCROLL_INTERVAL microseconds
-		if (currentTime - m_lastScrollTime >= SCROLL_INTERVAL) {
-				m_scrollPosition[0] = (m_scrollPosition[0] + 1) % (ACTUAL_COLS - displayCols + 1);
-				m_scrollPosition[1] = (m_scrollPosition[1] + 1) % (ACTUAL_COLS - displayCols + 1);
-				m_lastScrollTime = currentTime;
+
+		// Handle scrolling and pausing logic
+    if (currentTime - m_lastScrollTime >= SCROLL_INTERVAL) {
+      for (int r = 0; r < 2; r++) {
+				if (isPaused[r]) {
+					// Check if pause duration has elapsed
+					if (currentTime - pauseStartTime[r] >= PAUSE_DURATION) {
+						isPaused[r] = false;
+					}
+				} else {
+					// Update scroll position
+					m_scrollPosition[r]++;
+
+					// Check if we've reached the end
+					if (m_scrollPosition[r] >= ACTUAL_COLS - displayCols) {
+						m_scrollPosition[r] = ACTUAL_COLS - displayCols;
+						isPaused[r] = true;
+						pauseStartTime[r] = currentTime;
+					}
+					// Check if we need to reset to beginning
+					else if (m_scrollPosition[r] > ACTUAL_COLS - displayCols) {
+						m_scrollPosition[r] = 0;
+						isPaused[r] = true;
+						pauseStartTime[r] = currentTime;
+					}
+				}
+			}
+			m_lastScrollTime = currentTime;
 		}
+
+
 		// Calculate starting position for this row
     int startPos = m_scrollPosition[i];
 		for (int j = 0; j < displayCols; j++)

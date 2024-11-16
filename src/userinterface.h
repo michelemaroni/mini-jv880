@@ -79,7 +79,13 @@ private:
 
 	unsigned long m_lastScrollTime = 0;
 
+	bool isPaused[2] = {true, true};  // Start paused
+
+  unsigned long pauseStartTime[2] = {0, 0};
+
 	static const unsigned long SCROLL_INTERVAL = 500000;
+
+	static const unsigned long PAUSE_DURATION = 1000000;
 
 	static const int ACTUAL_COLS = 24;
 };
