@@ -123,9 +123,9 @@ void Pcm::PCM_Write(uint32_t address, uint8_t data)
             if ((address & 4) == 0)
                 ix |= 2;
 
-            pcm_lock.Acquire();
+            // pcm_lock.Acquire();
             pcm.ram1[pcm.select_channel][ix] = pcm.write_latch;
-            pcm_lock.Release();
+            // pcm_lock.Release();
         }
     }
     else if ((address >= 0x10 && address < 0x20) || (address >= 0x30 && address < 0x38))
@@ -147,9 +147,9 @@ void Pcm::PCM_Write(uint32_t address, uint8_t data)
             if (address & 32)
                 ix |= 8;
 
-            pcm_lock.Acquire();
+            // pcm_lock.Acquire();
             pcm.ram2[pcm.select_channel][ix] = pcm.write_latch;
-            pcm_lock.Release();
+            // pcm_lock.Release();
         }
     }
 }
@@ -170,7 +170,7 @@ uint8_t Pcm::PCM_Read(uint32_t address)
     }
     else if (address == 0x3c || address == 0x3e) // status
     {
-        pcm_lock.Acquire();
+        // pcm_lock.Acquire();
         uint8_t status = 0;
         if (address == 0x3e && pcm.irq_assert)
         {
@@ -181,7 +181,7 @@ uint8_t Pcm::PCM_Read(uint32_t address)
         status |= pcm.irq_channel;
         if (pcm.voice_mask_updating)
             status |= 32;
-        pcm_lock.Release();
+        // pcm_lock.Release();
 
         return status;
     }
@@ -426,7 +426,7 @@ void Pcm::PCM_Update(uint64_t cycles)
     int voice_active = pcm.voice_mask & pcm.voice_mask_pending;
     while (pcm.cycles < cycles)
     {
-        pcm_lock.Acquire();
+        // pcm_lock.Acquire();
 
         int tt[2] = {};
 
@@ -1263,8 +1263,9 @@ void Pcm::PCM_Update(uint64_t cycles)
                 int v2 = reg3 + (mult1 >> 6) + ((mult1 >> 5) & 1); // 9
                 int v1 = v2 + (mult2 >> 13) + ((mult2 >> 12) & 1); // 10
                 int subvar = v1 + (mult3 >> 6) + ((mult3 >> 5) & 1); // 11
+#define Clamp(v, x0, x1) (v < x0 ? x0 : v > x1 ? x1 : v)
 
-                ram1[3] = v1;
+                ram1[3] = Clamp(v1, -0x80000, 0x7ffff);
 
                 int tests = test;
                 tests <<= 12;
@@ -1277,7 +1278,7 @@ void Pcm::PCM_Update(uint64_t cycles)
                 int v4 = reg1 + (mult4 >> 6) + ((mult4 >> 5) & 1); // 14
                 int v5 = v4 + (mult5 >> 13) + ((mult5 >> 12) & 1); // 15
 
-                ram1[1] = v5;
+                ram1[1] = Clamp(v5, -0x80000, 0x7ffff);
             }
 
 
@@ -1421,7 +1422,7 @@ void Pcm::PCM_Update(uint64_t cycles)
             pcm.ram2[31][7] |= 0x20;
         }
 
-        pcm_lock.Release();
+        // pcm_lock.Release();
 
         pcm.nfs = 1;
 

@@ -23,6 +23,7 @@
 #define ARM_ALLOW_MULTI_CORE
 
 #include "config.h"
+#include "userinterface.h"
 #include "emulator/mcu.h"
 #include <circle/gpiomanager.h>
 #include <circle/i2cmaster.h>
@@ -33,7 +34,7 @@
 #include <circle/spimaster.h>
 #include <circle/spinlock.h>
 #include <circle/types.h>
-#include <circle/usb/usbkompletekontrol.h>
+// #include <circle/usb/usbkompletekontrol.h>
 #include <circle/usb/usbmidi.h>
 #include <fatfs/ff.h>
 #include <stdint.h>
@@ -41,7 +42,7 @@
 class CMiniJV880 : public CMultiCoreSupport {
 public:
   CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
-             CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster,
+             CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster, CSPIMaster *pSPIMaster,
              FATFS *pFileSystem, CScreenDevice *mScreenUnbuffered);
 
   bool Initialize(void);
@@ -55,23 +56,26 @@ public:
 
   MCU mcu;
 
+  CScreenDevice *screenUnbuffered;
+
 private:
   CConfig *m_pConfig;
   FATFS *m_pFileSystem;
 
   CUSBMIDIDevice *volatile m_pMIDIDevice = 0;
-  CUSBKompleteKontrolDevice *volatile m_KompleteKontrol = 0;
+  // CUSBKompleteKontrolDevice *volatile m_KompleteKontrol = 0;
   int lastEncoderPos = 0;
 
   CSoundBaseDevice *m_pSoundDevice;
   bool m_bChannelsSwapped;
   unsigned m_nQueueSizeFrames;
 
-  CScreenDevice *m_ScreenUnbuffered;
+  CUserInterface m_UI;
+
+  unsigned m_lastTick;
+  unsigned m_lastTick1;
 
   static CMiniJV880 *s_pThis;
-
-  u8 *screen_buffer;
 };
 
 #endif

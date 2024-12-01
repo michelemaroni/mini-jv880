@@ -30,24 +30,20 @@
 #include <stdio.h>
 #include <string.h>
 
-void set_pixel(unsigned char *screen, int x, int y, bool value) {
-  if (!value)
-    screen[(y / 8) * 128 + x] |= 1 << (y % 8);
-  else
-    screen[(y / 8) * 128 + x] &= ~(1 << (y % 8));
-}
-
 CMiniJV880 *CMiniJV880::s_pThis = 0;
 
 LOGMODULE("minijv880");
 
 CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
-                       CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster,
+                       CGPIOManager *pGPIOManager, CI2CMaster *pI2CMaster, CSPIMaster *pSPIMaster,
                        FATFS *pFileSystem, CScreenDevice *mScreenUnbuffered)
     : CMultiCoreSupport(CMemorySystem::Get()), m_pConfig(pConfig),
       m_pFileSystem(pFileSystem), m_pSoundDevice(0),
       m_bChannelsSwapped(pConfig->GetChannelsSwapped()),
-      m_ScreenUnbuffered(mScreenUnbuffered) {
+      screenUnbuffered(mScreenUnbuffered),
+      m_UI(this, pGPIOManager, pI2CMaster, pSPIMaster, pConfig),
+      m_lastTick(0),
+      m_lastTick1(0) {
   assert(m_pConfig);
 
   s_pThis = this;
@@ -79,13 +75,17 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
     m_pSoundDevice =
         new CPWMSoundBaseDevice(pInterrupt, 32000, pConfig->GetChunkSize());
   }
-
-  screen_buffer = (u8 *)malloc(512);
 };
 
 bool CMiniJV880::Initialize(void) {
   assert(m_pConfig);
   assert(m_pSoundDevice);
+
+  if (!m_UI.Initialize ())
+	{
+    LOGERR("Failed to initialize UI");
+		return false;
+	}
 
   LOGNOTE("Loading emu files");
   uint8_t *rom1 = (uint8_t *)malloc(ROM1_SIZE);
@@ -96,6 +96,7 @@ bool CMiniJV880::Initialize(void) {
 
   FIL f;
   unsigned int nBytesRead = 0;
+
   if (f_open(&f, "jv880_rom1.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
     LOGERR("Cannot open jv880_rom1.bin");
     return false;
@@ -103,32 +104,33 @@ bool CMiniJV880::Initialize(void) {
   f_read(&f, rom1, ROM1_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_rom2.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_rom2.bin");
     return false;
   }
   f_read(&f, rom2, ROM2_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_nvram.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_nvram.bin");
     return false;
   }
   f_read(&f, nvram, NVRAM_SIZE, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_waverom1.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_waverom1.bin");
     return false;
   }
   f_read(&f, pcm1, 0x200000, &nBytesRead);
   f_close(&f);
   if (f_open(&f, "jv880_waverom2.bin", FA_READ | FA_OPEN_EXISTING) != FR_OK) {
-    LOGERR("Cannot open jv880_rom1.bin");
+    LOGERR("Cannot open jv880_waverom2.bin");
     return false;
   }
   f_read(&f, pcm2, 0x200000, &nBytesRead);
   f_close(&f);
   LOGNOTE("Emu files loaded");
 
-  mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
+  int ret = mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
+  LOGNOTE("startSC55 returned: %d", ret);
   free(rom1);
   free(rom2);
   free(nvram);
@@ -156,126 +158,14 @@ bool CMiniJV880::Initialize(void) {
   m_pSoundDevice->Start();
 
   CMultiCoreSupport::Initialize();
+  LOGNOTE("initialised");
 
   return true;
 }
 
 void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
-  uint32_t *lcd_buffer = mcu.lcd.LCD_Update();
 
-  for (size_t y = 0; y < lcd_height; y++) {
-    for (size_t x = 0; x < lcd_width; x++) {
-      m_ScreenUnbuffered->SetPixel(x + 800, y + 100,
-                                   lcd_buffer[y * lcd_width + x]);
-    }
-  }
-
-  if (m_KompleteKontrol != 0) {
-    m_KompleteKontrol->Update();
-
-    uint32_t btn = 0;
-    if (m_KompleteKontrol->status.left)
-      btn |= 1 << MCU_BUTTON_CURSOR_L;
-    else
-      btn &= ~(1 << MCU_BUTTON_CURSOR_L);
-    if (m_KompleteKontrol->status.right)
-      btn |= 1 << MCU_BUTTON_CURSOR_R;
-    else
-      btn &= ~(1 << MCU_BUTTON_CURSOR_R);
-    if (m_KompleteKontrol->status.loop)
-      btn |= 1 << MCU_BUTTON_TONE_SELECT;
-    else
-      btn &= ~(1 << MCU_BUTTON_TONE_SELECT);
-    if (m_KompleteKontrol->status.metro)
-      btn |= 1 << MCU_BUTTON_MUTE;
-    else
-      btn &= ~(1 << MCU_BUTTON_MUTE);
-    if (m_KompleteKontrol->status.tempo)
-      btn |= 1 << MCU_BUTTON_DATA;
-    else
-      btn &= ~(1 << MCU_BUTTON_DATA);
-    if (m_KompleteKontrol->status.undo)
-      btn |= 1 << MCU_BUTTON_MONITOR;
-    else
-      btn &= ~(1 << MCU_BUTTON_MONITOR);
-    if (m_KompleteKontrol->status.quantize)
-      btn |= 1 << MCU_BUTTON_COMPARE;
-    else
-      btn &= ~(1 << MCU_BUTTON_COMPARE);
-    if (m_KompleteKontrol->status.jstick_push)
-      btn |= 1 << MCU_BUTTON_ENTER;
-    else
-      btn &= ~(1 << MCU_BUTTON_ENTER);
-    if (m_KompleteKontrol->status.ideas)
-      btn |= 1 << MCU_BUTTON_UTILITY;
-    else
-      btn &= ~(1 << MCU_BUTTON_UTILITY);
-    if (m_KompleteKontrol->status.play)
-      btn |= 1 << MCU_BUTTON_PREVIEW;
-    else
-      btn &= ~(1 << MCU_BUTTON_PREVIEW);
-    if (m_KompleteKontrol->status.quantize)
-      btn |= 1 << MCU_BUTTON_PATCH_PERFORM;
-    else
-      btn &= ~(1 << MCU_BUTTON_PATCH_PERFORM);
-    if (m_KompleteKontrol->status.shift)
-      btn |= 1 << MCU_BUTTON_EDIT;
-    else
-      btn &= ~(1 << MCU_BUTTON_EDIT);
-    if (m_KompleteKontrol->status.scale)
-      btn |= 1 << MCU_BUTTON_SYSTEM;
-    else
-      btn &= ~(1 << MCU_BUTTON_SYSTEM);
-    if (m_KompleteKontrol->status.arp)
-      btn |= 1 << MCU_BUTTON_RHYTHM;
-    else
-      btn &= ~(1 << MCU_BUTTON_RHYTHM);
-    mcu.mcu_button_pressed = btn;
-
-    if (m_KompleteKontrol->status.jstick_val > lastEncoderPos ||
-        (lastEncoderPos == 15 && m_KompleteKontrol->status.jstick_val == 0))
-      mcu.MCU_EncoderTrigger(1);
-    else if (m_KompleteKontrol->status.jstick_val < lastEncoderPos ||
-             (lastEncoderPos == 0 &&
-              m_KompleteKontrol->status.jstick_val == 15))
-      mcu.MCU_EncoderTrigger(0);
-    lastEncoderPos = m_KompleteKontrol->status.jstick_val;
-
-    for (size_t y = 0; y < 32; y++) {
-      for (size_t x = 0; x < 128; x++) {
-        int destX = (int)(((float)x / 128) * 820);
-        int destY = (int)(((float)y / 32) * 100);
-        int sum = 0;
-        for (int py = -1; py <= 1; py++) {
-          for (int px = -1; px <= 1; px++) {
-            if ((destY + py) >= 0 && (destX + px) >= 0) {
-              bool pixel =
-                  mcu.lcd.lcd_buffer[destY + py][destX + px] == lcd_col1;
-              sum += pixel;
-            }
-          }
-        }
-
-        bool pixel = sum > 0;
-        // bool pixel = mcu.lcd.lcd_buffer[destY][destX] == lcd_col1;
-        set_pixel(screen_buffer, x, y, pixel);
-
-        // m_ScreenUnbuffered->SetPixel(x + 800, y + 300, pixel ? 0xFFFF : 0x0000);
-      }
-    }
-
-    KompleteKontrolScreenCommand tmp;
-    for (size_t row = 0; row < 4; row++) {
-      for (size_t column = 0; column < 4; column++) {
-        tmp.lengthRow = 1;
-        tmp.lengthCol = 32;
-        tmp.offsetRow = row;
-        tmp.offsetCol = column * 32;
-        memcpy(tmp.content, screen_buffer + row * 128 + column * 32, 32);
-        m_KompleteKontrol->SendScreen(&tmp);
-      }
-    }
-  }
+  m_UI.Process ();
 
   if (!bPlugAndPlayUpdated)
     return;
@@ -286,26 +176,6 @@ void CMiniJV880::Process(bool bPlugAndPlayUpdated) {
     if (m_pMIDIDevice != 0) {
       m_pMIDIDevice->RegisterPacketHandler(USBMIDIMessageHandler);
       m_pMIDIDevice->RegisterRemovedHandler(DeviceRemovedHandler, this);
-    }
-  }
-
-  if (m_KompleteKontrol == 0) {
-    m_KompleteKontrol =
-        (CUSBKompleteKontrolDevice *)CDeviceNameService::Get()->GetDevice(
-            "kompletekontrol1", FALSE);
-    if (m_KompleteKontrol != 0) {
-      // m_KompleteKontrol->RegisterPacketHandler(s_pMIDIPacketHandler[m_nInstance]);
-      m_KompleteKontrol->RegisterRemovedHandler(DeviceRemovedHandler, this);
-
-      m_KompleteKontrol->DisableLocalControls();
-      // m_KompleteKontrol->SendLEDs();
-
-      // u8 content[256] = {0};
-      // for (size_t i = 0; i < 256; i++) {
-      //   content[i] = 0xff;
-      // }
-      // m_KompleteKontrol->SendScreenUpper(content);
-      // m_KompleteKontrol->SendScreenLower(content);
     }
   }
 }
@@ -325,8 +195,6 @@ void CMiniJV880::DeviceRemovedHandler(CDevice *pDevice, void *pContext) {
 
   if (pDevice == pThis->m_pMIDIDevice)
     pThis->m_pMIDIDevice = 0;
-  if (pDevice == pThis->m_KompleteKontrol)
-    pThis->m_KompleteKontrol = 0;
 }
 
 // double avg = 0;
@@ -343,6 +211,7 @@ void CMiniJV880::Run(unsigned nCore) {
     //     m_pMIDIDevice->hostDevice->Update();
     //   }
     // }
+    return;
   } else if (nCore == 2) {
     // emulator
     while (true) {
@@ -352,6 +221,7 @@ void CMiniJV880::Run(unsigned nCore) {
         // unsigned int startT = CTimer::GetClockTicks();
 
         nSamples = (int)nFrames * 2;
+        // Try on single core only RPi4
         // mcu.updateSC55(nSamples);
 
         mcu.sample_write_ptr = 0;
@@ -370,8 +240,7 @@ void CMiniJV880::Run(unsigned nCore) {
           mcu.MCU_UpdateUART_RX();
           mcu.MCU_UpdateUART_TX();
           mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
-
-          // mcu.pcm.PCM_Update(mcu.mcu.cycles);
+          mcu.pcm.PCM_Update(mcu.mcu.cycles);
         }
 
         // unsigned int endT = CTimer::GetClockTicks();
@@ -390,10 +259,12 @@ void CMiniJV880::Run(unsigned nCore) {
     // LOGNOTE("%d samples in %d time", nFrames, m_GetChunkTimer);
   } else if (nCore == 3) {
     // pcm chip
-    while (true) {
-      // while (mcu.sample_write_ptr >= nSamples) {
-      // }
-      mcu.pcm.PCM_Update(mcu.mcu.cycles);
-    }
+    // while (true) {
+    //   // while (mcu.sample_write_ptr >= nSamples) {
+    //   // }
+    //   // Try on single core only RPi4
+    //   mcu.pcm.PCM_Update(mcu.mcu.cycles);
+    // }
+    return;
   }
 }

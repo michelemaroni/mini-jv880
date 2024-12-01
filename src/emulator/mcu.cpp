@@ -34,13 +34,18 @@
 #include "mcu.h"
 #include <stdio.h>
 #include <string.h>
+#include <circle/logger.h>
 
 #if __linux__
 #include <limits.h>
 #include <unistd.h>
 #endif
 
-void MCU::MCU_ErrorTrap() { printf("trap %.2x %.4x\n", mcu.cp, mcu.pc); }
+LOGMODULE("mcu");
+
+void MCU::MCU_ErrorTrap() {
+  LOGERR("trap %.2x %.4x\n", mcu.cp, mcu.pc);
+}
 
 uint16_t MCU::MCU_AnalogReadPin(const uint32_t pin) {
   if (pin == 1)
@@ -295,8 +300,8 @@ uint8_t MCU::MCU_Read(uint32_t address) {
         ga_int_trigger = 0;
         MCU_Interrupt_SetRequest(INTERRUPT_SOURCE_IRQ0, 0);
       }
-      // else
-      //     printf("Unknown read %x%04x\n", page, address);
+      else
+          LOGWARN("Unknown read %x%04x\n", page, address);
     }
     break;
   case 1:
@@ -323,8 +328,8 @@ uint8_t MCU::MCU_Read(uint32_t address) {
   case 13:
     ret = nvram[address & 0x7fff];
     break;
-    // default:
-    //     printf("Unknown read %x%04x\n", page, address);
+    default:
+        LOGWARN("Unknown read %x%04x\n", page, address);
   }
   return ret;
 }
@@ -350,16 +355,16 @@ void MCU::MCU_Write(uint32_t address, const uint8_t value) {
       pcm.PCM_Write(address & 0x3f, value);
     else if (address >= 0xff80)
       MCU_DeviceWrite(address & 0x7f, value);
-    // else
-    //     printf("Unknown write %x%04x\n", page, address);
+    else
+        LOGWARN("Unknown write %x%04x\n", page, address);
   } else if (page == 10)
     sram[address & 0x7fff] = value;
   else if (page == 12)
     nvram[address & 0x7fff] = value;
   else if (page == 14)
     cardram[address & 0x7fff] = value;
-  // else
-  //     printf("Unknown write %x%04x\n", page, address);
+  else
+      LOGWARN("Unknown write %x%04x\n", page, address);
 }
 
 void MCU::MCU_Init() { memset(&mcu, 0, sizeof(mcu_t)); }
