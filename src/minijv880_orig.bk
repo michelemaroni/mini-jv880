@@ -19,7 +19,6 @@
 //
 #include "minijv880.h"
 #include <assert.h>
-#include <atomic>
 #include <circle/devicenameservice.h>
 #include <circle/gpiopin.h>
 #include <circle/logger.h>
@@ -30,45 +29,6 @@
 #include <circle/usb/usbmidihost.h>
 #include <stdio.h>
 #include <string.h>
-
-// Audio ring buffer for decoupling emulation and audio output
-static constexpr int AUDIO_RING_FRAMES = 4096;
-static int16_t audio_ring_buffer[AUDIO_RING_FRAMES * 2]; // stereo
-static std::atomic<size_t> audio_ring_write{0};
-static std::atomic<size_t> audio_ring_read{0};
-
-static inline size_t audio_ring_available() {
-    size_t w = audio_ring_write.load(std::memory_order_acquire);
-    size_t r = audio_ring_read.load(std::memory_order_acquire);
-    return (w >= r) ? (w - r) : (AUDIO_RING_FRAMES - (r - w));
-}
-
-static inline size_t audio_ring_space() {
-    return AUDIO_RING_FRAMES - audio_ring_available() - 1;
-}
-
-static void audio_ring_write_samples(const int16_t* samples, size_t frames) {
-    for (size_t i = 0; i < frames; ++i) {
-        size_t w = audio_ring_write.load(std::memory_order_relaxed);
-        size_t next_w = (w + 1) % AUDIO_RING_FRAMES;
-        if (next_w == audio_ring_read.load(std::memory_order_acquire)) break; // full
-        audio_ring_buffer[w * 2] = samples[i * 2];
-        audio_ring_buffer[w * 2 + 1] = samples[i * 2 + 1];
-        audio_ring_write.store(next_w, std::memory_order_release);
-    }
-}
-
-static size_t audio_ring_read_samples(int16_t* out, size_t frames) {
-    size_t read_frames = 0;
-    for (; read_frames < frames; ++read_frames) {
-        size_t r = audio_ring_read.load(std::memory_order_relaxed);
-        if (r == audio_ring_write.load(std::memory_order_acquire)) break; // empty
-        out[read_frames * 2] = audio_ring_buffer[r * 2];
-        out[read_frames * 2 + 1] = audio_ring_buffer[r * 2 + 1];
-        audio_ring_read.store((r + 1) % AUDIO_RING_FRAMES, std::memory_order_release);
-    }
-    return read_frames;
-}
 
 CMiniJV880 *CMiniJV880::s_pThis = 0;
 
@@ -90,12 +50,10 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
 
   // select the sound device
   const char *pDeviceName = pConfig->GetSoundDevice();
-  int chunkSize = pConfig->GetChunkSize() / 2; // Reduce chunk size for lower latency
-  if (chunkSize < 128) chunkSize = 128; // Don't go too low
   if (strcmp(pDeviceName, "i2s") == 0) {
     LOGNOTE("I2S mode");
     m_pSoundDevice = new CI2SSoundBaseDevice(
-        pInterrupt, 32000, chunkSize, false, pI2CMaster,
+        pInterrupt, 32000, pConfig->GetChunkSize(), false, pI2CMaster,
         pConfig->GetDACI2CAddress(), CI2SSoundBaseDevice::DeviceModeTXOnly,
         2); // 2 channels - L+R
   } else if (strcmp(pDeviceName, "hdmi") == 0) {
@@ -105,7 +63,7 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
     LOGNOTE("HDMI mode");
 
     m_pSoundDevice =
-        new CHDMISoundBaseDevice(pInterrupt, 32000, chunkSize);
+        new CHDMISoundBaseDevice(pInterrupt, 32000, pConfig->GetChunkSize());
 
     // The channels are swapped by default in the HDMI sound driver.
     // TODO: Remove this line, when this has been fixed in the driver.
@@ -115,7 +73,7 @@ CMiniJV880::CMiniJV880(CConfig *pConfig, CInterruptSystem *pInterrupt,
     LOGNOTE("PWM mode");
 
     m_pSoundDevice =
-        new CPWMSoundBaseDevice(pInterrupt, 32000, chunkSize);
+        new CPWMSoundBaseDevice(pInterrupt, 32000, pConfig->GetChunkSize());
   }
 };
 
@@ -130,12 +88,11 @@ bool CMiniJV880::Initialize(void) {
 	}
 
   LOGNOTE("Loading emu files");
-  // Use new/delete for C++ style and possible optimizations
-  uint8_t *rom1 = new uint8_t[ROM1_SIZE];
-  uint8_t *rom2 = new uint8_t[ROM2_SIZE];
-  uint8_t *nvram = new uint8_t[NVRAM_SIZE];
-  uint8_t *pcm1 = new uint8_t[0x200000];
-  uint8_t *pcm2 = new uint8_t[0x200000];
+  uint8_t *rom1 = (uint8_t *)malloc(ROM1_SIZE);
+  uint8_t *rom2 = (uint8_t *)malloc(ROM2_SIZE);
+  uint8_t *nvram = (uint8_t *)malloc(NVRAM_SIZE);
+  uint8_t *pcm1 = (uint8_t *)malloc(0x200000);
+  uint8_t *pcm2 = (uint8_t *)malloc(0x200000);
 
   FIL f;
   unsigned int nBytesRead = 0;
@@ -174,18 +131,23 @@ bool CMiniJV880::Initialize(void) {
 
   int ret = mcu.startSC55(rom1, rom2, pcm1, pcm2, nvram);
   LOGNOTE("startSC55 returned: %d", ret);
-  delete[] rom1;
-  delete[] rom2;
-  delete[] nvram;
-  delete[] pcm1;
-  delete[] pcm2;
+  free(rom1);
+  free(rom2);
+  free(nvram);
+  free(pcm1);
+  free(pcm2);
 
   // setup and start the sound device
   int Channels = 2; // 16-bit Stereo
-  int queueFrames = 2 * m_pConfig->GetChunkSize() / Channels / 2; // halve for lower latency
-  if (queueFrames < 128) queueFrames = 128;
-  if (!m_pSoundDevice->AllocateQueueFrames(queueFrames)) {
+  // Need 2 x ChunkSize / Channel queue frames as the audio driver uses
+  // two DMA channels each of ChunkSize and one single single frame
+  // contains a sample for each of all the channels.
+  //
+  // See discussion here: https://github.com/rsta2/circle/discussions/453
+  if (!m_pSoundDevice->AllocateQueueFrames(2 * m_pConfig->GetChunkSize() /
+                                           Channels)) {
     LOGERR("Cannot allocate sound queue");
+
     return false;
   }
 
@@ -243,26 +205,26 @@ void CMiniJV880::Run(unsigned nCore) {
   assert(1 <= nCore && nCore < CORES);
 
   if (nCore == 1) {
-    // Core 1: MIDI polling
-    while (true) {
-      if (m_pMIDIDevice != 0) {
-        // Poll MIDI device for new data
-        if (m_pMIDIDevice->hostDevice)
-          m_pMIDIDevice->hostDevice->Update();
-      }
-      // Small sleep/yield to avoid busy-waiting
-      asm volatile("nop");
-    }
+    // while (true) {
+    //   if (m_pMIDIDevice != 0) {
+    //     assert(m_pMIDIDevice->hostDevice != 0);
+    //     m_pMIDIDevice->hostDevice->Update();
+    //   }
+    // }
+    return;
   } else if (nCore == 2) {
-    // Core 2: Emulator and audio rendering
-    static int16_t local_buffer[512 * 2]; // stereo
+    // emulator
     while (true) {
-      // Only render if there is space in the ring buffer
-      size_t space = audio_ring_space();
-      if (space >= 256) {
-        int render_samples = (space > 512) ? 512 : space;
+      unsigned nFrames =
+          m_nQueueSizeFrames - m_pSoundDevice->GetQueueFramesAvail();
+      if (nFrames >= m_nQueueSizeFrames / 2) {
+        // unsigned int startT = CTimer::GetClockTicks();
+
+        nSamples = (int)nFrames * 2;
+        // Try on single core only RPi4
+        // mcu.updateSC55(nSamples);
+
         mcu.sample_write_ptr = 0;
-        int nSamples = render_samples * 2;
         while (mcu.sample_write_ptr < nSamples) {
           if (!mcu.mcu.ex_ignore)
             mcu.MCU_Interrupt_Handle();
@@ -280,42 +242,29 @@ void CMiniJV880::Run(unsigned nCore) {
           mcu.MCU_UpdateAnalog(mcu.mcu.cycles);
           mcu.pcm.PCM_Update(mcu.mcu.cycles);
         }
-        // Copy to local buffer and write to ring buffer
-        memcpy(local_buffer, mcu.sample_buffer, nSamples * sizeof(int16_t));
-        audio_ring_write_samples(local_buffer, render_samples);
-      } else {
-        // Not enough space, yield
-        asm volatile("nop");
-      }
-    }
-  } else if (nCore == 3) {
-    // Core 3: PCM chip emulation (optional, if PCM_Update is heavy)
-    while (true) {
-      // mcu.pcm.PCM_Update(mcu.mcu.cycles);
-      asm volatile("nop");
-    }
-  } else if (nCore == 0) {
-    // Core 0: Audio output and UI
-    static int16_t out_buffer[512 * 2];
-    while (true) {
-      // Write audio from ring buffer to sound device
-      size_t avail = audio_ring_available();
-      if (avail >= 128) {
-        size_t to_write = (avail > 512) ? 512 : avail;
-        size_t got = audio_ring_read_samples(out_buffer, to_write);
-        int len = got * 2 * sizeof(int16_t);
-        if (len > 0) {
-          if (m_pSoundDevice->Write(out_buffer, len) != len) {
-            LOGERR("Sound data dropped");
-          }
+
+        // unsigned int endT = CTimer::GetClockTicks();
+        // avg = avg == 0 ? (endT - startT) : avg * 0.99 + (endT - startT) *
+        // 0.01; if (cnt++ == 100) {
+        //   LOGNOTE("%f\n", avg);
+        //   cnt = 0;
+        // }
+
+        int len = nSamples * sizeof(int16_t);
+        if (m_pSoundDevice->Write(mcu.sample_buffer, len) != len) {
+          LOGERR("Sound data dropped");
         }
-      } else {
-        // Not enough audio, yield
-        asm volatile("nop");
       }
-      // UI and MIDI device management
-      m_UI.Process();
-      // ...existing code for MIDI device hotplug...
     }
+    // LOGNOTE("%d samples in %d time", nFrames, m_GetChunkTimer);
+  } else if (nCore == 3) {
+    // pcm chip
+    // while (true) {
+    //   // while (mcu.sample_write_ptr >= nSamples) {
+    //   // }
+    //   // Try on single core only RPi4
+    //   mcu.pcm.PCM_Update(mcu.mcu.cycles);
+    // }
+    return;
   }
 }
