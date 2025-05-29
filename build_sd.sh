@@ -40,3 +40,8 @@ cd sdcard
 cp ../kernels/* . || true
 zip -r ../MiniJV880_$GITHUB_RUN_NUMBER_$(date +%Y-%m-%d).zip *
 cd -
+
+#clean up
+rm -rf sdcard **/*.o **/*.d **/*.elf **/*.img **/*.lst **/*.map #src/*.o #src/*.d src/Makefile src/config.txt src/minijv880.ini
+echo "Build completed successfully. The zip file is located in the current directory."
+#

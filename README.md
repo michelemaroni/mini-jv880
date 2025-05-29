@@ -27,9 +27,6 @@ $ bash build.sh 3 # Pass RPI number
 $ bash build_sd.sh 3 # Pass RPI number
 ```
 
-A
-
-
 
 ## Acknowledgements
 

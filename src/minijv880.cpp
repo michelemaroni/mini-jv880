@@ -244,15 +244,15 @@ void CMiniJV880::Run(unsigned nCore) {
 
   if (nCore == 1) {
     // Core 1: MIDI polling
-    while (true) {
-      if (m_pMIDIDevice != 0) {
-        // Poll MIDI device for new data
-        if (m_pMIDIDevice->hostDevice)
-          m_pMIDIDevice->hostDevice->Update();
-      }
-      // Small sleep/yield to avoid busy-waiting
-      asm volatile("nop");
-    }
+    // while (true) {
+    //   if (m_pMIDIDevice != 0) {
+    //     // Poll MIDI device for new data
+    //     if (m_pMIDIDevice->hostDevice)
+    //       m_pMIDIDevice->hostDevice->Update();
+    //   }
+    // Small sleep/yield to avoid busy-waiting
+    // asm volatile("nop");
+    // }
   } else if (nCore == 2) {
     // Core 2: Emulator and audio rendering
     static int16_t local_buffer[512 * 2]; // stereo
